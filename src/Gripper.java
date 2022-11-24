@@ -8,19 +8,21 @@ public class Gripper {
         this.servo = new Servo(inputPin);
     }
 
-    private void open(){
+    public void open(){
         for (int i = 1325; i <= 1850; i += 3) {
             servo.update(i);
             BoeBot.wait(5);
-            System.out.println(i);
+//            System.out.println(i);
+//            System.out.println("op en");
         }
     }
 
-    private void close(){
+    public void close(){
         for (int i = 1850; i >= 1325; i -= 3) {
             servo.update(i);
             BoeBot.wait(5);
-            System.out.println(i);
+//            System.out.println(i);
+//            System.out.println("sluit");
         }
     }
 

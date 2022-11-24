@@ -54,6 +54,7 @@ public class Motor {
     }
 
     public void stop() {
-        this.servo.update(1500);
+//        this.servo.update(1500);
+        this.servo.stop();
     }
 }

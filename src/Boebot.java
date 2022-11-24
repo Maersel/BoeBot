@@ -18,20 +18,20 @@ public class Boebot {
     }
 
     public void demo1() {
-        while (boebotStatus) {
-            boebot.forward();
-            if (ultrasonic.detectObject()) {
-                boebot.stop();
-                buzzer.beepThreeTimes();
-                if (ultrasonic.detectObject()) {
-                    buzzer.beepThreeTimes();
-                    if (ultrasonic.detectObject()) {
-                        buzzer.beepThreeTimes();
-                        boebot.forward();
-                    }
-                }
-            }
-        }
+//        while (boebotStatus) {
+//            boebot.forward();
+//            if (ultrasonic.detectObject()) {
+//                boebot.stop();
+//                buzzer.beepThreeTimes();
+//                if (ultrasonic.detectObject()) {
+//                    buzzer.beepThreeTimes();
+//                    if (ultrasonic.detectObject()) {
+//                        buzzer.beepThreeTimes();
+//                        boebot.forward();
+//                    }
+//                }
+//            }
+//        }
 
     }
 }

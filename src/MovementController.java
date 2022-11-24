@@ -32,7 +32,7 @@ public class MovementController {
     public void turnLeft() {
         leftMotor.reverse();
         rightMotor.start();
-        BoeBot.wait(550);
+        BoeBot.wait(50);
 
         leftMotor.stop();
         rightMotor.stop();
@@ -41,7 +41,7 @@ public class MovementController {
     public void turnRight() {
         leftMotor.start();
         rightMotor.reverse();
-        BoeBot.wait(550);
+        BoeBot.wait(50);
 
         leftMotor.stop();
         rightMotor.stop();
