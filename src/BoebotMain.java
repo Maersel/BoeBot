@@ -91,15 +91,6 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private void run() {
         while (true) {
-            if (Math.random() < 0.0005) {
-                if (Math.random() < 0.5) {
-                    this.gripper.open();
-                    System.out.println("open");
-                } else {
-                    this.gripper.close();
-                    System.out.println("sluit");
-                }
-            }
 
             for (Updatable device : devices) {
                 device.update();

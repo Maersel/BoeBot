@@ -1,7 +1,13 @@
 package hardware.ultrasonic;
 
-public class UltraSonic {
+import hardware.Updatable;
+
+public class UltraSonic implements Updatable {
     private int pin;
     private Callback callback;
 
+    @Override
+    public void update() {
+
+    }
 }
