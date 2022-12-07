@@ -50,8 +50,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private Button emergencyButton;
 
     public void init() {
-        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
-        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Output); // FIX
+//        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
+//        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Output); // FIX
 
         this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
@@ -69,7 +69,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.lineFollower = new LineFollower(this.movementController, this.sensorLeft, this.sensorRight, this.sensorMiddle);
 
-//        this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
+        this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
         this.devices = new ArrayList<>();
         this.devices.add(this.gripperMotor);

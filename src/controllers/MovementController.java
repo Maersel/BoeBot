@@ -44,4 +44,18 @@ public class MovementController {
 
 //        this.leftMotor.goToSpeed(80);
     }
+
+    public void boosy() {
+        this.leftMotor.goToSpeed(200);
+        this.rightMotor.goToSpeed(200);
+    }
+
+    public void turnRight() {
+        this.leftMotor.goToSpeed(-30);
+        this.rightMotor.goToSpeed(30);
+    }
+    public void turnLeft() {
+        this.leftMotor.goToSpeed(30);
+        this.rightMotor.goToSpeed(-30);
+    }
 }
