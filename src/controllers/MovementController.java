@@ -6,19 +6,21 @@ public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
 
+    private boolean isTurning;
+
     public MovementController(MovementMotor leftMotor, MovementMotor rightMotor) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
     }
 
     public void forward() {
-        this.leftMotor.goToSpeed(40);
-        this.rightMotor.goToSpeed(40);
+        this.leftMotor.goToSpeed(30);
+        this.rightMotor.goToSpeed(30);
     }
 
     public void backwards() {
-        this.leftMotor.goToSpeed(-40);
-        this.rightMotor.goToSpeed(-40);
+        this.leftMotor.goToSpeed(-30);
+        this.rightMotor.goToSpeed(-30);
     }
 
     public void stop() {
@@ -33,15 +35,15 @@ public class MovementController {
 
     public void correctLeft() {
 //        this.leftMotor.changeSpeed(-1);
-        this.rightMotor.changeSpeed(1);
+//        this.rightMotor.changeSpeed(1);
 
-//        this.rightMotor.goToSpeed(80);
+        this.rightMotor.goToSpeed(60);
     }
 
     public void correctRight() {
-        this.leftMotor.changeSpeed(1);
+//        this.leftMotor.changeSpeed(1);
 //        this.rightMotor.changeSpeed(-1);
 
-//        this.leftMotor.goToSpeed(80);
+        this.leftMotor.goToSpeed(60);
     }
 }

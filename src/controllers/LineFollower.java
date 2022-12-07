@@ -10,16 +10,24 @@ public class LineFollower implements Callback, Updatable {
     private InfraRed middleSensor;
     private InfraRed rightSensor;
 
+    private boolean currentMode;
+
+    private StateController stateController;
+
     //
     private int lineDetection;
 
 
-    public LineFollower(MovementController movementController, InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor) {
+    public LineFollower(MovementController movementController,
+                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor,
+                        StateController stateController) {
         this.movementController = movementController;
         this.leftSensor = leftSensor;
         this.middleSensor = middleSensor;
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
+
+        this.stateController = stateController;
 
         this.setCallbacks();
     }
@@ -28,6 +36,10 @@ public class LineFollower implements Callback, Updatable {
         this.leftSensor.setCallback(this);
         this.middleSensor.setCallback(this);
         this.rightSensor.setCallback(this);
+    }
+
+    public void setMode(boolean state) {
+        this.currentMode = state;
     }
 
     @Override
@@ -45,6 +57,8 @@ public class LineFollower implements Callback, Updatable {
 
     @Override
     public void update() {
+        if (stateController.currentState() != Configuration.LINE_FOLLOWING_STATE) return;
+
         switch (this.lineDetection) {
             case 0b000:
                 System.out.println("geen detectie");
@@ -76,7 +90,8 @@ public class LineFollower implements Callback, Updatable {
                 break;
             case 0b111:
                 System.out.println("Lijn middel, links en rechts");
-                this.movementController.emergencyStop();
+//                this.movementController.emergencyStop();
+                this.movementController.stop();
                 break;
             default:
                 System.out.println("de lul lmao");
