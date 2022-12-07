@@ -81,10 +81,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-//        this.devices.add(this.sensorLeft);
-//        this.devices.add(this.sensorRight);
-//        this.devices.add(this.sensorMiddle);
-//        this.devices.add(this.lineFollower);
+        this.devices.add(this.sensorLeft);
+        this.devices.add(this.sensorRight);
+        this.devices.add(this.sensorMiddle);
+        this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
     }
@@ -121,6 +121,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     @Override
     public void onUltraSonic(int distance, UltraSonic source) {
+        System.out.println("");
 
     }
 }
