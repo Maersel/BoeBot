@@ -15,6 +15,7 @@ public class MovementMotor extends Motor {
         } else {
             this.goalSpeed = super.defaultSpeed + goalSpeed;
         }
+        update();
     }
 
     public void increaseSpeed() {
