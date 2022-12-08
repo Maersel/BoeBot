@@ -25,6 +25,7 @@ public class Test {
     public final int MOTOR_PIN_LEFT = 12;
     public final int MOTOR_PIN_RIGHT = 13;
     private Bluetooth bluetooth;
+    private NeoPixel neoPixel;
 
 
     private ArrayList<Updatable> devices;
@@ -43,11 +44,14 @@ public class Test {
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight);
         this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController);
+        this.neoPixel = new NeoPixel();
 
 
         this.devices = new ArrayList<>();
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
+        this.devices.add(this.neoPixel);
+
 //        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController);
 
 
