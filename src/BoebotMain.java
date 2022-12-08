@@ -2,7 +2,10 @@ import TI.BoeBot;
 import TI.PinMode;
 import controllers.LineFollower;
 import controllers.MovementController;
+import controllers.RemoteController;
+import controllers.StateController;
 import hardware.Updatable;
+import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
 import hardware.gripper.Gripper;
 import hardware.linesensor.InfraRed;
@@ -10,6 +13,8 @@ import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
 import hardware.ultrasonic.UltraSonic;
 import hardware.whisker.Whisker;
+
+import java.rmi.Remote;
 import java.util.ArrayList;
 
 public class BoebotMain implements hardware.whisker.Callback, hardware.button.Callback,
@@ -23,9 +28,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     public final int GRIPPER_PIN = 6;
     public final int MOTOR_PIN_LEFT = 12;
     public final int MOTOR_PIN_RIGHT = 13;
-    public final int SENSOR_PIN_LEFT = 2;
+    public final int SENSOR_PIN_LEFT = 1;
     public final int SENSOR_PIN_RIGHT = 3;
-    public final int SENSOR_PIN_MIDDLE = 1;
+    public final int SENSOR_PIN_MIDDLE = 2;
 
     public final int WHISKER_PIN_LEFT = 0;
     public final int WHISKER_PIN_RIGHT = 1;
@@ -49,6 +54,12 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private Button emergencyButton;
 
+    private UltraSonic ultraSonic;
+    private RemoteController remoteController;
+    private StateController stateController;
+
+    private Bluetooth bluetooth;
+
     public void init() {
 //        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
 //        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Output); // FIX
@@ -67,12 +78,15 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this.sensorLeft, this.sensorRight, this.sensorMiddle);
+        this.lineFollower = new LineFollower(this.movementController, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.stateController);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
+        this.stateController = new StateController(this.lineFollower, this.movementController,
+                this.bluetooth, this.ultraSonic);
+
         this.devices = new ArrayList<>();
-        this.devices.add(this.gripperMotor);
+//        this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
@@ -81,25 +95,25 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-//        this.devices.add(this.sensorLeft);
-//        this.devices.add(this.sensorRight);
-//        this.devices.add(this.sensorMiddle);
-//        this.devices.add(this.lineFollower);
+        this.devices.add(this.sensorLeft);
+        this.devices.add(this.sensorRight);
+        this.devices.add(this.sensorMiddle);
+        this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
     }
 
     private void run() {
         while (true) {
-            if (Math.random() < 0.0005) {
-                if (Math.random() < 0.5) {
-                    this.gripper.open();
-                    System.out.println("open");
-                } else {
-                    this.gripper.close();
-                    System.out.println("sluit");
-                }
-            }
+//            if (Math.random() < 0.0005) {
+//                if (Math.random() < 0.5) {
+//                    this.gripper.open();
+//                    System.out.println("open");
+//                } else {
+//                    this.gripper.close();
+//                    System.out.println("sluit");
+//                }
+//            }
 
             for (Updatable device : devices) {
                 device.update();
@@ -123,9 +137,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     @Override
     public void onButtonPress(Button source) {
-        if (source == this.emergencyButton) {
-            this.movementController.emergencyStop();
-        }
+//        if (source == this.emergencyButton) {
+//            this.movementController.emergencyStop();
+//        }
     }
 
     @Override

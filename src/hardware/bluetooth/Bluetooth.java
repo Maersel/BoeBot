@@ -1,9 +1,12 @@
 package hardware.bluetooth;
 
 import TI.SerialConnection;
+import controllers.Configuration;
 import controllers.MovementController;
 
-public class Bluetooth {
+import javax.swing.plaf.nimbus.State;
+
+public class Bluetooth implements CheckState {
 
     private final SerialConnection serial;
     private final MovementController movementController;
@@ -17,10 +20,12 @@ public class Bluetooth {
     private final int correctLeftKey = 'a';
     private final int boosyKey = 'r';
 
-
-    public Bluetooth(SerialConnection serial, MovementController movementController) {
+    public Bluetooth(SerialConnection serial, MovementController movementController,
+                     StateController stateController, Callback callback) {
         this.serial = serial;
         this.movementController = movementController;
+        this.stateController = stateController;
+        this.callback = callback;
     }
 
 
@@ -33,6 +38,7 @@ public class Bluetooth {
     }
 
     public void remote(){
+
         if (serial.available() > 0) {
             int data = serial.readByte();
 
@@ -85,5 +91,10 @@ public class Bluetooth {
             movementController.stop();
             System.out.println("stop");
         }
+    }
+
+    @Override
+    public boolean isInValidState() {
+        return (this.stateController.currentState() == Configuration.REMOTE_STATE);
     }
 }
