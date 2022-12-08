@@ -8,12 +8,18 @@ import hardware.Updatable;
 public class UltraSonic implements Updatable {
     private int pin;
     private Callback callback;
-    Timer timer = new Timer(900);
+    private Timer timer;
+
+    public UltraSonic(int pin, Callback callback) {
+        this.pin = pin;
+        this.callback = callback;
+        this.timer = new Timer(900);
+    }
 
     @Override
     public void update() {
         if (timer.timeout()){
-            getDistance();
+            callback.onUltraSonic(getDistance());
         }
     }
 
@@ -33,6 +39,5 @@ public class UltraSonic implements Updatable {
 
     public boolean closeObject(){
         return (this.getDistance() >= 14);
-
     }
 }

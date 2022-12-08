@@ -3,6 +3,8 @@ package hardware.bluetooth;
 import TI.SerialConnection;
 import controllers.Configuration;
 import controllers.MovementController;
+import controllers.StateController;
+import hardware.CheckState;
 
 import javax.swing.plaf.nimbus.State;
 
@@ -19,6 +21,8 @@ public class Bluetooth implements CheckState {
     private final int correctRightKey = 'g';
     private final int correctLeftKey = 'a';
     private final int boosyKey = 'r';
+    private final StateController stateController;
+    private final Callback callback;
 
     public Bluetooth(SerialConnection serial, MovementController movementController,
                      StateController stateController, Callback callback) {

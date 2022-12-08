@@ -11,7 +11,7 @@ public class GoatScering {
     Timer timer = new Timer(2000);
 
     public GoatScering(MovementController movementController) {
-        this.distance = 13;
+        this.distance = 14;
         this.movementController = movementController;
     }
 
