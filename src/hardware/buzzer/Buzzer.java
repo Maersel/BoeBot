@@ -32,6 +32,10 @@ public class Buzzer implements Updatable {
         this.isTurnedOn = false;
     }
 
+    public boolean isTurnedOn() {
+        return this.isTurnedOn;
+    }
+
     public void ping() {
         if (firstPing && this.timer.timeout()) {
             System.out.println("a");
