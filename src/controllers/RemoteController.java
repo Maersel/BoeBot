@@ -18,6 +18,7 @@ public class RemoteController implements Updatable {
 
     @Override
     public void update() {
+        System.out.println(BoeBot.digitalRead(1));
 //        int pulseLen = BoeBot.pulseIn(0, false, 6000);
 //        if (pulseLen > 2000) {
 //            int lengths[] = new int[7];

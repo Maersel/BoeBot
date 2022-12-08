@@ -5,6 +5,7 @@ import controllers.MovementController;
 import controllers.RemoteController;
 import controllers.StateController;
 import hardware.Updatable;
+import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
 import hardware.gripper.Gripper;
 import hardware.linesensor.InfraRed;
@@ -57,6 +58,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private RemoteController remoteController;
     private StateController stateController;
 
+    private Bluetooth bluetooth;
+
     public void init() {
 //        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
 //        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Output); // FIX
@@ -80,7 +83,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
         this.stateController = new StateController(this.lineFollower, this.movementController,
-                this.remoteController, this.ultraSonic);
+                this.bluetooth, this.ultraSonic);
 
         this.devices = new ArrayList<>();
 //        this.devices.add(this.gripperMotor);

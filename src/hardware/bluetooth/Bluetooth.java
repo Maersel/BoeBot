@@ -2,18 +2,29 @@ package hardware.bluetooth;
 
 import TI.BoeBot;
 import TI.SerialConnection;
+import controllers.Configuration;
 import controllers.MovementController;
+import controllers.StateController;
+import hardware.CheckState;
 import hardware.Updatable;
 import hardware.led.NeoPixel;
 
-public class Bluetooth {
+import javax.swing.plaf.nimbus.State;
+
+public class Bluetooth implements CheckState {
 
     private SerialConnection serial;
     private MovementController movementController;
+    private StateController stateController;
 
-    public Bluetooth(SerialConnection serial, MovementController movementController) {
+    private Callback callback;
+
+    public Bluetooth(SerialConnection serial, MovementController movementController,
+                     StateController stateController, Callback callback) {
         this.serial = serial;
         this.movementController = movementController;
+        this.stateController = stateController;
+        this.callback = callback;
     }
 
 
@@ -26,8 +37,18 @@ public class Bluetooth {
     }
 
     public void remote(){
+
         if (serial.available() > 0) {
             int data = serial.readByte();
+
+            if (data == Configuration.EMERGENCY_STATE || data == Configuration.GOAT_SCARING_STATE ||
+                    data == Configuration.REMOTE_STATE || data == Configuration.REST_STATE ||
+                    data == Configuration.LINE_FOLLOWING_STATE || data == Configuration.SLOWING_DOWN_STATE) { // VERANDER STATE COMMANDS
+                this.callback.onBlueToothInput(data);
+            }
+
+            if (!isInValidState()) return;
+
             if (data == 101) {
                 movementController.forward();
                 System.out.println("forward");
@@ -54,5 +75,10 @@ public class Bluetooth {
                 System.out.println("stop");
             }
         }
+    }
+
+    @Override
+    public boolean isInValidState() {
+        return (this.stateController.currentState() == Configuration.REMOTE_STATE);
     }
 }
