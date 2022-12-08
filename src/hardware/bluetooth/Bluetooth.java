@@ -69,6 +69,10 @@ public class Bluetooth {
                 movementController.turnRight();
                 System.out.println("turnRight");
             }
+//            else if ()
+//            {
+//
+//            }
             else{
                 movementController.stop();
                 System.out.println("stop");

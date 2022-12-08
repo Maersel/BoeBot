@@ -3,12 +3,13 @@ package hardware.led;
 import TI.BoeBot;
 import hardware.Updatable;
 
-
 import java.awt.*;
-import java.util.ArrayList;
 
 
 public class NeoPixel implements Updatable {
+
+    public NeoPixel(){
+    }
 
     public static void setColour(float aColor){
        Color color;
