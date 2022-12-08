@@ -1,11 +1,12 @@
 package hardware.bluetooth;
 
 import TI.SerialConnection;
-import TI.Timer;
+import controllers.Configuration;
 import controllers.MovementController;
-import hardware.led.NeoPixel;
 
-public class Bluetooth {
+import javax.swing.plaf.nimbus.State;
+
+public class Bluetooth implements CheckState {
 
     private final SerialConnection serial;
     private final MovementController movementController;
@@ -27,11 +28,13 @@ public class Bluetooth {
 
     Timer t = new Timer(100);
 
-
-    public Bluetooth(SerialConnection serial, MovementController movementController) {
+    public Bluetooth(SerialConnection serial, MovementController movementController,
+                     StateController stateController, Callback callback) {
         this.serial = serial;
         this.movementController = movementController;
         t.mark();
+        this.stateController = stateController;
+        this.callback = callback;
     }
 
 
@@ -44,6 +47,7 @@ public class Bluetooth {
     }
 
     public void remote(){
+
         if (serial.available() > 0) {
             int data = serial.readByte();
 
@@ -115,5 +119,10 @@ public class Bluetooth {
                 System.out.println("stop");
             }
         }
+    }
+
+    @Override
+    public boolean isInValidState() {
+        return (this.stateController.currentState() == Configuration.REMOTE_STATE);
     }
 }
