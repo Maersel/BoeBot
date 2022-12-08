@@ -28,8 +28,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     }
 
     public final int GRIPPER_PIN = 6;
-    public final int MOTOR_PIN_LEFT = 12;
-    public final int MOTOR_PIN_RIGHT = 13;
+    public final int MOTOR_PIN_LEFT = 13;
+    public final int MOTOR_PIN_RIGHT = 12;
     public final int SENSOR_PIN_LEFT = 1;
     public final int SENSOR_PIN_RIGHT = 3;
     public final int SENSOR_PIN_MIDDLE = 2;
@@ -39,6 +39,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     public final int EMERGENCY_BUTTON_PIN = 2;
 
     public final int BUZZER_PIN = 3;
+
+    public final int ULTRASONIC_ECHO_PIN = 8;
+    public final int ULTRASONIC_TRIGGER_PIN = 2;
 
     private ArrayList<Updatable> devices;
     private Gripper gripper;
@@ -97,6 +100,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.goatScering = new GoatScering(this.movementController);
 
+        this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
+
         this.devices = new ArrayList<>();
 //        this.devices.add(this.gripperMotor);
 
@@ -115,10 +120,12 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.emergencyButton);
 
         this.devices.add(this.buzzer);
+
+        this.devices.add(this.ultraSonic);
     }
 
     private void run() {
-       this.goatScering.push();
+       this.movementController.forward();
 
 
         while (true) {
@@ -132,9 +139,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //                }
 //            }
 
-//            for (Updatable device : devices) {
-//                device.update();
-//            }
+            for (Updatable device : devices) {
+                device.update();
+            }
 
             BoeBot.wait(1);
         }
@@ -160,7 +167,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     }
 
     @Override
-    public void onUltraSonic(int distance, UltraSonic source) {
-
+    public void onUltraSonic() {
+        if (this.ultraSonic.closeObject()){
+//            movementController.stop();
+            movementController.emergencyStop();
+        }
     }
 }

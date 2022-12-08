@@ -42,7 +42,7 @@ public class Test {
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight);
-        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController);
+//        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController);
 
 
         this.devices = new ArrayList<>();
