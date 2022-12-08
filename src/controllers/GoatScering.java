@@ -88,6 +88,7 @@ public class GoatScering implements Updatable {
                 if (timer.timeout()) {
                     this.markTimers();
                     this.buzzer.turnOff();
+//                    this.moving = false;
                     this.push();
                 }
             }

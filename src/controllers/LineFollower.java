@@ -48,7 +48,7 @@ public class LineFollower implements Callback, Updatable {
     public void update() {
         switch (this.lineDetection) {
             case 0b000:
-                System.out.println("geen detectie");
+//                System.out.println("geen detectie");
 //                this.movementController.stop();
                 this.movementController.forward();
                 break;

@@ -13,7 +13,7 @@ public class Button implements Updatable {
     }
 
     public boolean buttonPressed() {
-        return BoeBot.digitalRead(this.pin);
+        return !BoeBot.digitalRead(this.pin);
     }
 
     @Override

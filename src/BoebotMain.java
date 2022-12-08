@@ -1,10 +1,6 @@
 import TI.BoeBot;
 import TI.PinMode;
-import controllers.GoatScering;
-import controllers.LineFollower;
-import controllers.MovementController;
-import controllers.RemoteController;
-import controllers.StateController;
+import controllers.*;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
@@ -36,7 +32,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     public final int WHISKER_PIN_LEFT = 0;
     public final int WHISKER_PIN_RIGHT = 1;
-    public final int EMERGENCY_BUTTON_PIN = 2;
+
+    public final int EMERGENCY_BUTTON_PIN = 0;
 
     public final int BUZZER_PIN = 3;
 
@@ -72,8 +69,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private Bluetooth bluetooth;
 
     public void init() {
-//        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
-//        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Output); // FIX
+        BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
+        BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Input); // FIX
 
         this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
@@ -103,7 +100,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
 
         this.devices = new ArrayList<>();
-//        this.devices.add(this.gripperMotor);
+        this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
@@ -112,12 +109,12 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-        this.devices.add(this.sensorLeft);
-        this.devices.add(this.sensorRight);
-        this.devices.add(this.sensorMiddle);
-        this.devices.add(this.lineFollower);
+//        this.devices.add(this.sensorLeft);
+//        this.devices.add(this.sensorRight);
+//        this.devices.add(this.sensorMiddle);
+//        this.devices.add(this.lineFollower);
 
-//        this.devices.add(this.emergencyButton);
+        this.devices.add(this.emergencyButton);
 
         this.devices.add(this.buzzer);
 
@@ -125,19 +122,19 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     }
 
     private void run() {
-       this.movementController.forward();
-
+        this.movementController.forward();
 
         while (true) {
-//            if (Math.random() < 0.0005) {
-//                if (Math.random() < 0.5) {
-//                    this.gripper.open();
-//                    System.out.println("open");
-//                } else {
-//                    this.gripper.close();
-//                    System.out.println("sluit");
-//                }
-//            }
+
+            if (Math.random() < 0.0005) {
+                if (Math.random() < 0.5) {
+                    this.gripper.open();
+                    System.out.println("open");
+                } else {
+                    this.gripper.close();
+                    System.out.println("sluit");
+                }
+            }
 
             for (Updatable device : devices) {
                 device.update();
@@ -161,16 +158,50 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     @Override
     public void onButtonPress(Button source) {
-//        if (source == this.emergencyButton) {
-//            this.movementController.emergencyStop();
-//        }
+        if (source == this.emergencyButton) {
+            this.movementController.emergencyStop();
+        }
     }
+
+    boolean isScaringGoats = false;
 
     @Override
     public void onUltraSonic() {
-        if (this.ultraSonic.closeObject()){
+        if (!isScaringGoats){
+
 //            movementController.stop();
             movementController.emergencyStop();
+//            this.goatScering.push();
+
+//            this.devices.add(new Delay("goatscarer forward", this.devices, 1000, () -> {
+//                this.movementController.forward();
+//            }));
+//
+//            this.devices.add(new Delay("goatscarerer backwards", this.devices, 1500, () -> {
+//                this.movementController.backwards();
+//            }));
+//
+
+
+            this.addDelay("goatscare forwards", 1000, () -> {
+                this.movementController.forward();
+            });
+
+            this.addDelay("goatscare backwards", 1500, () -> {
+                this.movementController.backwards();
+            });
+
+            this.addDelay("goatscare stop", 2000, () -> {
+                this.movementController.stop();
+                isScaringGoats = false;
+
+            });
+
+            System.out.println("ultrsasoon");
         }
+    }
+
+    public void addDelay(String name, int time, TimerCallback callback) {
+        this.devices.add(new Delay(name, this.devices, time, callback));
     }
 }
