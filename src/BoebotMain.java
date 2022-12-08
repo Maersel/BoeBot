@@ -28,8 +28,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     }
 
     public final int GRIPPER_PIN = 6;
-    public final int MOTOR_PIN_LEFT = 13;
-    public final int MOTOR_PIN_RIGHT = 12;
+    public final int MOTOR_PIN_LEFT = 12;
+    public final int MOTOR_PIN_RIGHT = 13;
     public final int SENSOR_PIN_LEFT = 1;
     public final int SENSOR_PIN_RIGHT = 3;
     public final int SENSOR_PIN_MIDDLE = 2;
@@ -78,8 +78,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
 
-        this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, false);
-        this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, true);
+        this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
+        this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight);
 
         this.whiskerLeft = new Whisker(WHISKER_PIN_LEFT, this);
@@ -89,7 +89,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.stateController);
+        this.lineFollower = new LineFollower(this.movementController, this.sensorLeft, this.sensorRight, this.sensorMiddle);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
@@ -98,7 +98,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScering(this.movementController);
+        this.goatScering = new GoatScering(this.movementController, this.buzzer);
 
         this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
 
