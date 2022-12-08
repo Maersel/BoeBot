@@ -19,7 +19,7 @@ public class UltraSonic implements Updatable {
     @Override
     public void update() {
         if (timer.timeout()){
-            callback.onUltraSonic(getDistance());
+            callback.onUltraSonic();
         }
     }
 
