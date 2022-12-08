@@ -60,4 +60,9 @@ public class MovementController {
         this.leftMotor.goToSpeed(30);
         this.rightMotor.goToSpeed(-30);
     }
+
+    public void update() {
+        rightMotor.MMupdate();
+        leftMotor.MMupdate();
+    }
 }

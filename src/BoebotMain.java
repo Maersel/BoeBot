@@ -132,9 +132,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //                }
 //            }
 
-            for (Updatable device : devices) {
-                device.update();
-            }
+//            for (Updatable device : devices) {
+//                device.update();
+//            }
 
             BoeBot.wait(1);
         }
