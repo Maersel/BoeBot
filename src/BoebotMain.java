@@ -1,5 +1,6 @@
 import TI.BoeBot;
 import TI.PinMode;
+import controllers.GoatScering;
 import controllers.LineFollower;
 import controllers.MovementController;
 import controllers.RemoteController;
@@ -7,6 +8,7 @@ import controllers.StateController;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
+import hardware.buzzer.Buzzer;
 import hardware.gripper.Gripper;
 import hardware.linesensor.InfraRed;
 import hardware.motor.GripperMotor;
@@ -36,6 +38,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     public final int WHISKER_PIN_RIGHT = 1;
     public final int EMERGENCY_BUTTON_PIN = 2;
 
+    public final int BUZZER_PIN = 3;
+
     private ArrayList<Updatable> devices;
     private Gripper gripper;
     private GripperMotor gripperMotor;
@@ -53,6 +57,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private Whisker whiskerRight;
 
     private Button emergencyButton;
+
+    private Buzzer buzzer;
+
+    private GoatScering goatScering;
 
     private UltraSonic ultraSonic;
     private RemoteController remoteController;
@@ -85,6 +93,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.stateController = new StateController(this.lineFollower, this.movementController,
                 this.bluetooth, this.ultraSonic);
 
+        this.buzzer = new Buzzer(BUZZER_PIN);
+
+        this.goatScering = new GoatScering(this.movementController);
+
         this.devices = new ArrayList<>();
 //        this.devices.add(this.gripperMotor);
 
@@ -101,9 +113,14 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
+
+        this.devices.add(this.buzzer);
     }
 
     private void run() {
+       this.goatScering.push();
+
+
         while (true) {
 //            if (Math.random() < 0.0005) {
 //                if (Math.random() < 0.5) {
