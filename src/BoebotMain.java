@@ -144,7 +144,6 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     @Override
     public void onUltraSonic(int distance, UltraSonic source) {
-        System.out.println("");
 
     }
 }
