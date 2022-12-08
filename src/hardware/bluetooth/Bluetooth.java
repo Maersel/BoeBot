@@ -1,23 +1,24 @@
 package hardware.bluetooth;
 
-import TI.BoeBot;
 import TI.SerialConnection;
 import controllers.Configuration;
 import controllers.MovementController;
-import controllers.StateController;
-import hardware.CheckState;
-import hardware.Updatable;
-import hardware.led.NeoPixel;
 
 import javax.swing.plaf.nimbus.State;
 
 public class Bluetooth implements CheckState {
 
-    private SerialConnection serial;
-    private MovementController movementController;
-    private StateController stateController;
+    private final SerialConnection serial;
+    private final MovementController movementController;
 
-    private Callback callback;
+
+    private final int forwardKey = 'e';
+    private final int backwardKey = 'd';
+    private final int turnLeftKey = 's';
+    private final int rightTurnKey = 'f';
+    private final int correctRightKey = 'g';
+    private final int correctLeftKey = 'a';
+    private final int boosyKey = 'r';
 
     public Bluetooth(SerialConnection serial, MovementController movementController,
                      StateController stateController, Callback callback) {
@@ -41,39 +42,54 @@ public class Bluetooth implements CheckState {
         if (serial.available() > 0) {
             int data = serial.readByte();
 
-            if (data == Configuration.EMERGENCY_STATE || data == Configuration.GOAT_SCARING_STATE ||
-                    data == Configuration.REMOTE_STATE || data == Configuration.REST_STATE ||
-                    data == Configuration.LINE_FOLLOWING_STATE || data == Configuration.SLOWING_DOWN_STATE) { // VERANDER STATE COMMANDS
-                this.callback.onBlueToothInput(data);
-            }
-
-            if (!isInValidState()) return;
-
-            if (data == 101) {
+            if (data == forwardKey)
+            {
                 movementController.forward();
                 System.out.println("forward");
-            }else if (data == 100) {
+            }
+            else if (data == backwardKey)
+            {
                 movementController.backwards();
                 System.out.println("backwards");
-            }else if (data == 97) {
+            }
+            else if (data == correctLeftKey)
+            {
                 movementController.correctLeft();
                 System.out.println("correctLeft");
-            }else if (data == 103) {
+            }
+            else if (data == correctRightKey)
+            {
                 movementController.correctRight();
                 System.out.println("correctRight");
-            }else if (data == 32) {
+            }
+            else if (data == boosyKey)
+            {
                 movementController.boosy();
                 System.out.println("boosy");
-            }else if (data == 115) {
+            }
+            else if (data == turnLeftKey) {
                 movementController.turnLeft();
                 System.out.println("turnLeft");
-            }else if (data == 102) {
+            }
+            else if (data == rightTurnKey) {
                 movementController.turnRight();
                 System.out.println("turnRight");
-            }else{
+            }
+//            else if ()
+//            {
+//
+//            }
+            else{
                 movementController.stop();
                 System.out.println("stop");
             }
+        }
+//        else if () {
+//
+//        }
+        else {
+            movementController.stop();
+            System.out.println("stop");
         }
     }
 
