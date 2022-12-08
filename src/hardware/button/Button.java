@@ -12,9 +12,13 @@ public class Button implements Updatable {
         this.callback = callback;
     }
 
+    public boolean buttonPressed() {
+        return BoeBot.digitalRead(this.pin);
+    }
+
     @Override
     public void update() {
-        if (BoeBot.digitalRead(this.pin)) {
+        if (this.buttonPressed()) {
             this.callback.onButtonPress(this);
         }
     }

@@ -33,6 +33,7 @@ private int getDistance() {
 
     public boolean closeObject(){
         return (this.getDistance() >= 14);
+
     }
 }
 
