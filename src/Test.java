@@ -24,10 +24,12 @@ public class Test {
 
     public final int MOTOR_PIN_LEFT = 12;
     public final int MOTOR_PIN_RIGHT = 13;
+    private Bluetooth bluetooth;
+
 
     private ArrayList<Updatable> devices;
 
-    private Bluetooth bluetooth;
+
     private MovementController movementController;
     private MovementMotor motorLeft;
     private MovementMotor motorRight;

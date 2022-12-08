@@ -1,15 +1,22 @@
 package hardware.bluetooth;
 
-import TI.BoeBot;
 import TI.SerialConnection;
 import controllers.MovementController;
-import hardware.Updatable;
-import hardware.led.NeoPixel;
 
 public class Bluetooth {
 
-    private SerialConnection serial;
-    private MovementController movementController;
+    private final SerialConnection serial;
+    private final MovementController movementController;
+
+
+    private final int forwardKey = 'e';
+    private final int backwardKey = 'd';
+    private final int turnLeftKey = 's';
+    private final int rightTurnKey = 'f';
+    private final int correctRightKey = 'g';
+    private final int correctLeftKey = 'a';
+    private final int boosyKey = 'r';
+
 
     public Bluetooth(SerialConnection serial, MovementController movementController) {
         this.serial = serial;
@@ -28,31 +35,51 @@ public class Bluetooth {
     public void remote(){
         if (serial.available() > 0) {
             int data = serial.readByte();
-            if (data == 101) {
+
+            if (data == forwardKey)
+            {
                 movementController.forward();
                 System.out.println("forward");
-            }else if (data == 100) {
+            }
+            else if (data == backwardKey)
+            {
                 movementController.backwards();
                 System.out.println("backwards");
-            }else if (data == 97) {
+            }
+            else if (data == correctLeftKey)
+            {
                 movementController.correctLeft();
                 System.out.println("correctLeft");
-            }else if (data == 103) {
+            }
+            else if (data == correctRightKey)
+            {
                 movementController.correctRight();
                 System.out.println("correctRight");
-            }else if (data == 32) {
+            }
+            else if (data == boosyKey)
+            {
                 movementController.boosy();
                 System.out.println("boosy");
-            }else if (data == 115) {
+            }
+            else if (data == turnLeftKey) {
                 movementController.turnLeft();
                 System.out.println("turnLeft");
-            }else if (data == 102) {
+            }
+            else if (data == rightTurnKey) {
                 movementController.turnRight();
                 System.out.println("turnRight");
-            }else{
+            }
+            else{
                 movementController.stop();
                 System.out.println("stop");
             }
+        }
+//        else if () {
+//
+//        }
+        else {
+            movementController.stop();
+            System.out.println("stop");
         }
     }
 }
