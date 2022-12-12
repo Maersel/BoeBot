@@ -1,3 +1,4 @@
+
 package controllers;
 
 import hardware.Updatable;
@@ -47,7 +48,7 @@ public class LineFollower implements Callback, Updatable {
     public void update() {
         switch (this.lineDetection) {
             case 0b000:
-                System.out.println("geen detectie");
+//                System.out.println("geen detectie");
 //                this.movementController.stop();
                 this.movementController.forward();
                 break;
@@ -76,7 +77,8 @@ public class LineFollower implements Callback, Updatable {
                 break;
             case 0b111:
                 System.out.println("Lijn middel, links en rechts");
-                this.movementController.emergencyStop();
+                //this.movementController.emergencyStop();
+                this.movementController.turnRight();
                 break;
             default:
                 System.out.println("de lul lmao");

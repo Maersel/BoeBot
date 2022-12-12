@@ -12,9 +12,12 @@ public class MovementMotor extends Motor {
     public void goToSpeed(int goalSpeed) {
         if (isReversed) {
             this.goalSpeed = super.defaultSpeed - goalSpeed;
+
         } else {
             this.goalSpeed = super.defaultSpeed + goalSpeed;
         }
+//        System.out.println(goalSpeed);
+        update();
     }
 
     public void increaseSpeed() {
@@ -36,5 +39,9 @@ public class MovementMotor extends Motor {
             super.goalSpeed -= amount;
         else
             super.goalSpeed += amount;
+    }
+
+    public void MMupdate() {
+        update();
     }
 }

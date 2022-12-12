@@ -7,7 +7,7 @@ public class Motor implements Updatable {
     private Servo servo;
     private int minSpeed;
     private int maxSpeed;
-    private int currentSpeed;
+    protected int currentSpeed;
     protected int goalSpeed;
     protected int defaultSpeed;
     protected int stepSize = 1;
@@ -37,12 +37,17 @@ public class Motor implements Updatable {
 
     @Override
     public void update() {
+//        System.out.println("Goal speed: " + goalSpeed);
+//        System.out.println("Current speed: " + currentSpeed);
+//        System.out.println("Max speed: " + maxSpeed);
         if (this.goalSpeed > this.currentSpeed && this.currentSpeed < this.maxSpeed) {
             this.currentSpeed += this.stepSize;
+//            System.out.println(currentSpeed);
         } else if (this.goalSpeed < this.currentSpeed && this.currentSpeed > this.minSpeed) {
             this.currentSpeed -= this.stepSize;
         }
 
         this.servo.update(this.currentSpeed);
+//        System.out.println(currentSpeed);
     }
 }
