@@ -4,6 +4,7 @@ package controllers;
 import TI.BoeBot;
 import TI.Timer;
 import hardware.Updatable;
+import hardware.buzzer.Buzzer;
 import hardware.motor.MovementMotor;
 import hardware.ultrasonic.UltraSonic;
 
@@ -12,14 +13,16 @@ public class GoatScering implements Updatable {
     private Timer timer;
     private Timer timer1;
     private Timer timer2;
+    private Buzzer buzzer;
     private boolean moving;
     private boolean isTurnedOn;
 
-    public GoatScering(MovementController movementController) {
+    public GoatScering(MovementController movementController, Buzzer buzzer) {
         this.movementController = movementController;
         this.timer = new Timer(6000);
         this.timer1 = new Timer(2000);
         this.timer2 = new Timer(4000);
+        this.buzzer = buzzer;
         this.moving = false;
     }
 
@@ -71,6 +74,8 @@ public class GoatScering implements Updatable {
     public void update() {
         if (this.isTurnedOn()) {
             if (this.moving) {
+                this.buzzer.turnOn();
+
                 if (timer1.timeout()) {
                     System.out.println("Stop");
                     movementController.stop();
@@ -82,6 +87,8 @@ public class GoatScering implements Updatable {
                 }
                 if (timer.timeout()) {
                     this.markTimers();
+                    this.buzzer.turnOff();
+//                    this.moving = false;
                     this.push();
                 }
             }

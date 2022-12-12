@@ -38,6 +38,7 @@ public class MovementController {
 //        this.rightMotor.changeSpeed(1);
 
         this.rightMotor.goToSpeed(60);
+        this.leftMotor.goToSpeed(10);
     }
 
     public void correctRight() {
@@ -45,6 +46,7 @@ public class MovementController {
 //        this.rightMotor.changeSpeed(-1);
 
         this.leftMotor.goToSpeed(60);
+        this.rightMotor.goToSpeed(10);
     }
 
     public void boosy() {

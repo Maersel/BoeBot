@@ -6,26 +6,29 @@ import TI.Timer;
 import hardware.Updatable;
 
 public class UltraSonic implements Updatable {
-    private int pin;
+    private int pinEcho;
+    private int pinTrigger;
     private Callback callback;
     private Timer timer;
 
-    public UltraSonic(int pin, Callback callback) {
-        this.pin = pin;
+    public UltraSonic(int pinEcho, int pinTrigger, Callback callback) {
+        this.pinEcho = pinEcho;
+        this.pinTrigger = pinTrigger;
         this.callback = callback;
         this.timer = new Timer(900);
+
+        BoeBot.setMode(this.pinEcho, PinMode.Input);
+        BoeBot.setMode(this.pinTrigger, PinMode.Output);
     }
 
     @Override
     public void update() {
-        if (timer.timeout()){
+        if (timer.timeout() && closeObject()){
             callback.onUltraSonic();
         }
     }
 
     private int getDistance() {
-        BoeBot.setMode(8, PinMode.Input);
-        BoeBot.setMode(2, PinMode.Output);
 
         BoeBot.digitalWrite(2, true);
         BoeBot.uwait(1);           //Moet nog worden gefixed
@@ -38,6 +41,6 @@ public class UltraSonic implements Updatable {
     }
 
     public boolean closeObject(){
-        return (this.getDistance() >= 14);
+        return (this.getDistance() <= 14);
     }
 }

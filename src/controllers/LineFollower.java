@@ -1,34 +1,26 @@
+
 package controllers;
 
-import hardware.CheckState;
 import hardware.Updatable;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
-public class LineFollower implements Callback, Updatable, CheckState {
+public class LineFollower implements Callback, Updatable {
     private MovementController movementController;
     private InfraRed leftSensor;
     private InfraRed middleSensor;
     private InfraRed rightSensor;
 
-    private boolean currentMode;
-
-    private StateController stateController;
-
     //
     private int lineDetection;
 
 
-    public LineFollower(MovementController movementController,
-                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor,
-                        StateController stateController) {
+    public LineFollower(MovementController movementController, InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor) {
         this.movementController = movementController;
         this.leftSensor = leftSensor;
         this.middleSensor = middleSensor;
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
-
-        this.stateController = stateController;
 
         this.setCallbacks();
     }
@@ -37,10 +29,6 @@ public class LineFollower implements Callback, Updatable, CheckState {
         this.leftSensor.setCallback(this);
         this.middleSensor.setCallback(this);
         this.rightSensor.setCallback(this);
-    }
-
-    public void setMode(boolean state) {
-        this.currentMode = state;
     }
 
     @Override
@@ -58,11 +46,9 @@ public class LineFollower implements Callback, Updatable, CheckState {
 
     @Override
     public void update() {
-        if (!isInValidState()) return;
-
         switch (this.lineDetection) {
             case 0b000:
-                System.out.println("geen detectie");
+//                System.out.println("geen detectie");
 //                this.movementController.stop();
                 this.movementController.forward();
                 break;
@@ -91,9 +77,8 @@ public class LineFollower implements Callback, Updatable, CheckState {
                 break;
             case 0b111:
                 System.out.println("Lijn middel, links en rechts");
-//                this.movementController.emergencyStop();
-                this.movementController.stop();
-                this.movementController.turnLeft();
+                //this.movementController.emergencyStop();
+                this.movementController.turnRight();
                 break;
             default:
                 System.out.println("de lul lmao");
@@ -101,10 +86,5 @@ public class LineFollower implements Callback, Updatable, CheckState {
         }
 
         this.lineDetection = 0;
-    }
-
-    @Override
-    public boolean isInValidState() {
-        return (stateController.currentState() != Configuration.LINE_FOLLOWING_STATE);
     }
 }
