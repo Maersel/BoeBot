@@ -16,7 +16,7 @@ public class NeoPixel implements Updatable {
        boolean state = onOff;
        float bn = 0f;
        if (state){
-           bn = 1f;
+           bn = 0.4f;
        }
         for (int i = 0; i < 6; i++) {
             color = Color.getHSBColor(aColor, 1f, bn);

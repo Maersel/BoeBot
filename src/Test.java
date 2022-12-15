@@ -1,16 +1,12 @@
 import TI.BoeBot;
 import TI.SerialConnection;
-import controllers.LineFollower;
 import controllers.MovementController;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
-import hardware.button.Button;
 import hardware.gripper.Gripper;
 import hardware.led.NeoPixel;
-import hardware.linesensor.InfraRed;
 import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
-import hardware.whisker.Whisker;
 
 import java.util.ArrayList;
 
@@ -24,6 +20,7 @@ public class Test {
 
     public final int MOTOR_PIN_LEFT = 12;
     public final int MOTOR_PIN_RIGHT = 13;
+    public final int GRIPPER_PIN = 11;
     private Bluetooth bluetooth;
     private NeoPixel neoPixel;
 
@@ -34,6 +31,8 @@ public class Test {
     private MovementController movementController;
     private MovementMotor motorLeft;
     private MovementMotor motorRight;
+    private Gripper gripper;
+    private GripperMotor gripperMotor;
 
 
 
@@ -43,7 +42,9 @@ public class Test {
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight);
-        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController);
+        this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
+        this.gripper = new Gripper(gripperMotor);
+        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper);
         this.neoPixel = new NeoPixel();
 
 
@@ -61,9 +62,9 @@ public class Test {
     private void run() {
         while (true) {
 //            this.bluetooth.echoCode();
-//            this.movementController.forward();
+
             this.bluetooth.remote();
-            
+
             for (Updatable device : devices) {
                 device.update();
             }

@@ -1,5 +1,6 @@
 package controllers;
 
+import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
 
 public class MovementController {
@@ -14,7 +15,7 @@ public class MovementController {
     }
 
     public void forward() {
-        this.leftMotor.goToSpeed(30);
+        this.leftMotor.goToSpeed(31);
         this.rightMotor.goToSpeed(30);
     }
 
