@@ -100,7 +100,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
 
         this.devices = new ArrayList<>();
-        this.devices.add(this.gripperMotor);
+//        this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
@@ -114,9 +114,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.sensorMiddle);
 //        this.devices.add(this.lineFollower);
 
-        this.devices.add(this.emergencyButton);
+//        this.devices.add(this.emergencyButton);
 
-        this.devices.add(this.buzzer);
+//        this.devices.add(this.buzzer);
 
         this.devices.add(this.ultraSonic);
     }
@@ -126,18 +126,21 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         while (true) {
 
-            if (Math.random() < 0.0005) {
-                if (Math.random() < 0.5) {
-                    this.gripper.open();
-                    System.out.println("open");
-                } else {
-                    this.gripper.close();
-                    System.out.println("sluit");
-                }
-            }
+//            if (Math.random() < 0.0005) {
+//                if (Math.random() < 0.5) {
+//                    this.gripper.open();
+//                    System.out.println("open");
+//                } else {
+//                    this.gripper.close();
+//                    System.out.println("sluit");
+//                }
+//            }
 
-            for (Updatable device : devices) {
-                device.update();
+//            for (Updatable device : devices) {
+//                device.update();
+//            }
+            for (int i = devices.size() - 1; i >= 0; i--) {
+                devices.get(i).update();
             }
 
             BoeBot.wait(1);
@@ -167,39 +170,39 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     @Override
     public void onUltraSonic() {
-        if (!isScaringGoats){
 
-//            movementController.stop();
-            movementController.emergencyStop();
-//            this.goatScering.push();
+        if (!isScaringGoats) {
+            isScaringGoats = true;
+            movementController.stop();
 
-//            this.devices.add(new Delay("goatscarer forward", this.devices, 1000, () -> {
-//                this.movementController.forward();
-//            }));
-//
-//            this.devices.add(new Delay("goatscarerer backwards", this.devices, 1500, () -> {
-//                this.movementController.backwards();
-//            }));
-//
+            for (int i = 0; i < 3; i++) {
+                int time = i * 4000;
 
+                this.addDelay("goat scare forwards", time, () -> {
+                    this.movementController.forward();
+                });
 
-            this.addDelay("goatscare forwards", 1000, () -> {
-                this.movementController.forward();
+                time += 1000;
+                this.addDelay("goatscare stop", time, () -> {
+                    this.movementController.stop();
+                });
+
+                time += 1000;
+                this.addDelay("goat scare backwards", time, () -> {
+                    this.movementController.backwards();
+                });
+
+                time += 1000;
+                this.addDelay("goat scare stop", time, () -> {
+                    this.movementController.stop();
+                });
+            }
+            this.addDelay("done scarring", 12000, () -> {
+                isScaringGoats= false;
             });
-
-            this.addDelay("goatscare backwards", 1500, () -> {
-                this.movementController.backwards();
-            });
-
-            this.addDelay("goatscare stop", 2000, () -> {
-                this.movementController.stop();
-                isScaringGoats = false;
-
-            });
-
-            System.out.println("ultrsasoon");
         }
     }
+
 
     public void addDelay(String name, int time, TimerCallback callback) {
         this.devices.add(new Delay(name, this.devices, time, callback));
