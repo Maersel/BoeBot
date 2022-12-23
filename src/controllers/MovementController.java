@@ -1,19 +1,33 @@
 package controllers;
 
+import TI.BoeBot;
 import hardware.motor.MovementMotor;
 
 public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
+    private AddDelay addDelay;
 
     private boolean isTurning;
+    private boolean turningDelay;
 
-    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor) {
+    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
+        this.addDelay = delay;
+    }
+
+    public boolean isTurning() {
+        return this.isTurning;
+    }
+
+    public void turnOffTurning() {
+        if (!this.turningDelay)
+            this.isTurning = false;
     }
 
     public void forward() {
+        if (isTurning) return;
         this.leftMotor.goToSpeed(30);
         this.rightMotor.goToSpeed(30);
     }
@@ -33,18 +47,15 @@ public class MovementController {
         this.rightMotor.emergencyStop();
     }
 
-    public void correctLeft() {
-//        this.leftMotor.changeSpeed(-1);
-//        this.rightMotor.changeSpeed(1);
+    public void correctToTheRight() {
+        if (isTurning) return;
 
         this.rightMotor.goToSpeed(60);
         this.leftMotor.goToSpeed(10);
     }
 
-    public void correctRight() {
-//        this.leftMotor.changeSpeed(1);
-//        this.rightMotor.changeSpeed(-1);
-
+    public void correctToTheLeft() {
+        if (isTurning) return;
         this.leftMotor.goToSpeed(60);
         this.rightMotor.goToSpeed(10);
     }
@@ -55,16 +66,49 @@ public class MovementController {
     }
 
     public void turnRight() {
-        this.leftMotor.goToSpeed(-30);
-        this.rightMotor.goToSpeed(30);
+        if (!isTurning) {
+            System.out.println("turning right");
+            this.leftMotor.goToSpeed(0);
+            this.rightMotor.goToSpeed(75);
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(400);
+        }
     }
     public void turnLeft() {
-        this.leftMotor.goToSpeed(30);
-        this.rightMotor.goToSpeed(-30);
+        if (!isTurning) {
+            System.out.println("turning left");
+            this.leftMotor.goToSpeed(75);
+            this.rightMotor.goToSpeed(0);
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(400);
+        }
     }
 
-    public void update() {
-        rightMotor.MMupdate();
-        leftMotor.MMupdate();
+    public void turnAround() {
+        if (!isTurning) {
+            System.out.println("Turning around");
+
+            if (Math.random() > 0.5) {
+                this.leftMotor.goToSpeed(-30);
+                this.rightMotor.goToSpeed(30);
+            } else {
+                this.leftMotor.goToSpeed(30);
+                this.rightMotor.goToSpeed(-30);
+            }
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(1500);
+        }
+    }
+
+    private void addTurningDelay(int time) {
+        this.addDelay.addDelay("Turning delay", time, () -> {
+            this.turningDelay = false;
+        });
     }
 }

@@ -17,6 +17,7 @@ public class InfraRed implements Updatable {
 
     @Override
     public void update() {
+//        System.out.println(BoeBot.analogRead(pin));
         if (BoeBot.analogRead(pin) > 1450) {
             this.callback.onLineDetection(this);
         }
