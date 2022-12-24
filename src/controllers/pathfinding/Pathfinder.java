@@ -1,5 +1,7 @@
 package controllers.pathfinding;
 
+import controllers.RouteOptions;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -8,10 +10,10 @@ public class Pathfinder {
         Pathfinder pathfinder = new Pathfinder();
         ArrayList<Integer> path = pathfinder.nodePath(3, 20);
 
-        String[] directions = pathfinder.pathDirections(path);
+        RouteOptions[] directions = pathfinder.pathDirections(path);
 
         System.out.println("\nDirections:");
-        for (String direction : directions) {
+        for (RouteOptions direction : directions) {
             System.out.println(direction);
         }
     }
@@ -79,7 +81,7 @@ public class Pathfinder {
     }
 
     // Gaat ervan uit dat de bot al de juiste richting op kijkt
-    private String[] pathDirections(ArrayList<Integer> path) {
+    private RouteOptions[] pathDirections(ArrayList<Integer> path) {
 
         int[] directionCodes = new int[path.size() - 2];
 
@@ -108,22 +110,22 @@ public class Pathfinder {
         return translateDirections(directionCodes);
     }
 
-    private String[] translateDirections(int[] directionCodes) {
-        String[] pathDirections = new String[directionCodes.length];
-        String directionName = "";
+    private RouteOptions[] translateDirections(int[] directionCodes) {
+        RouteOptions[] pathDirections = new RouteOptions[directionCodes.length];
+        RouteOptions direction = RouteOptions.NOTHING;
         for (int i = 0; i < directionCodes.length; i++) {
             switch (directionCodes[i]) {
                 case -1:
-                    directionName = "Left";
+                    direction = RouteOptions.LEFT;
                     break;
                 case 0:
-                    directionName = "Straight";
+                    direction = RouteOptions.STRAIGHT;
                     break;
                 case 1:
-                    directionName = "Right";
+                    direction = RouteOptions.RIGHT;
                     break;
             }
-            pathDirections[i] = directionName;
+            pathDirections[i] = direction;
         }
 
         return pathDirections;
