@@ -58,12 +58,12 @@ public class Bluetooth implements CheckState {
             }
             else if (data == correctLeftKey)
             {
-                movementController.correctLeft();
+                movementController.correctToTheLeft();
                 System.out.println("correctLeft");
             }
             else if (data == correctRightKey)
             {
-                movementController.correctRight();
+                movementController.correctToTheRight();
                 System.out.println("correctRight");
             }
             else if (data == boosyKey)
