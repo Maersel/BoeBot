@@ -1,14 +1,18 @@
 
 package controllers;
 
+import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.led.NeoPixel;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
+import java.util.ArrayList;
+
 public class LineFollower implements Callback, Updatable {
     private MovementController movementController;
     private AddDelay addDelay;
+    private Pathfinder pathfinder;
     private InfraRed leftSensor;
     private InfraRed middleSensor;
     private InfraRed rightSensor;
@@ -20,10 +24,11 @@ public class LineFollower implements Callback, Updatable {
     private int step;
 
 
-    public LineFollower(MovementController movementController, AddDelay addDelay,
+    public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
                         InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor) {
         this.movementController = movementController;
         this.addDelay = addDelay;
+        this.pathfinder = pathfinder;
         this.leftSensor = leftSensor;
         this.middleSensor = middleSensor;
         this.rightSensor = rightSensor;
@@ -40,8 +45,10 @@ public class LineFollower implements Callback, Updatable {
         this.step = (this.step + 1) % this.route.length;
     }
 
-    public void setRoute(RouteOptions[] route) {
-        this.route = route;
+    public void setRoute(int startingPoint, int endPoint) {
+        ArrayList<Integer> path = pathfinder.nodePath(startingPoint, endPoint);
+
+        this.route = pathfinder.pathDirections(path);
         this.step = 0;
     }
 

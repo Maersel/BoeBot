@@ -1,6 +1,7 @@
 import TI.BoeBot;
 import TI.PinMode;
 import controllers.*;
+import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
@@ -39,6 +40,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     public final int ULTRASONIC_ECHO_PIN = 8;
     public final int ULTRASONIC_TRIGGER_PIN = 2;
 
+    private Pathfinder pathfinder;
+
     private ArrayList<Updatable> devices;
     private Gripper gripper;
     private GripperMotor gripperMotor;
@@ -68,15 +71,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private Bluetooth bluetooth;
 
     public void init() {
-//        RouteOptions[] route = {RouteOptions.RIGHT, RouteOptions.LEFT, RouteOptions.STRAIGHT,
-//                RouteOptions.LEFT, RouteOptions.RIGHT, RouteOptions.STRAIGHT, RouteOptions.STRAIGHT};{
-//        RouteOptions[] route = {RouteOptions.STRAIGHT, RouteOptions.RIGHT, RouteOptions.RIGHT, RouteOptions.RIGHT,
-//                RouteOptions.RIGHT, RouteOptions.STRAIGHT};
-//        RouteOptions[] route = {RouteOptions.STRAIGHT, RouteOptions.RIGHT, RouteOptions.LEFT, RouteOptions.LEFT,
-//        RouteOptions.RIGHT, RouteOptions.STRAIGHT, RouteOptions.STRAIGHT, RouteOptions.STRAIGHT, RouteOptions.STRAIGHT};
-//        RouteOptions[] route = {RouteOptions.STRAIGHT, RouteOptions.RIGHT, RouteOptions.LEFT};
-//        RouteOptions[] route = {RouteOptions.TURN_AROUND};
-        RouteOptions[] route = {RouteOptions.STRAIGHT, RouteOptions.STRAIGHT, RouteOptions.RIGHT, RouteOptions.RIGHT};
+        this.pathfinder = new Pathfinder();
 
         BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
         BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Input); // FIX
@@ -95,7 +90,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this, this.sensorLeft, this.sensorRight, this.sensorMiddle);
+        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
@@ -129,7 +124,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //
 //        this.devices.add(this.ultraSonic);
 
-        this.lineFollower.setRoute(route);
+        this.lineFollower.setRoute(23, 27);
     }
 
     private void run() {

@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Pathfinder {
-    public static void main(String[] args) {
-        Pathfinder pathfinder = new Pathfinder();
-        ArrayList<Integer> path = pathfinder.nodePath(3, 20);
-
-        RouteOptions[] directions = pathfinder.pathDirections(path);
-
-        System.out.println("\nDirections:");
-        for (RouteOptions direction : directions) {
-            System.out.println(direction);
-        }
-    }
+//    public static void main(String[] args) {
+//        Pathfinder pathfinder = new Pathfinder();
+//        ArrayList<Integer> path = pathfinder.nodePath(3, 20);
+//
+//        RouteOptions[] directions = pathfinder.pathDirections(path);
+//
+//        System.out.println("\nDirections:");
+//        for (RouteOptions direction : directions) {
+//            System.out.println(direction);
+//        }
+//    }
 
     private Node[] nodes;
 
@@ -24,7 +24,7 @@ public class Pathfinder {
         this.nodes = MapSetter.setMap();
     }
 
-    private ArrayList<Integer> nodePath(int startingPoint, int endPoint) {
+    public ArrayList<Integer> nodePath(int startingPoint, int endPoint) {
         System.out.println("Going from point\t" + startingPoint);
         System.out.println("To point\t\t\t" + endPoint);
 
@@ -81,7 +81,7 @@ public class Pathfinder {
     }
 
     // Gaat ervan uit dat de bot al de juiste richting op kijkt
-    private RouteOptions[] pathDirections(ArrayList<Integer> path) {
+    public RouteOptions[] pathDirections(ArrayList<Integer> path) {
 
         int[] directionCodes = new int[path.size() - 2];
 
