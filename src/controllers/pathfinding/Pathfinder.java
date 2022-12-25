@@ -8,26 +8,48 @@ import java.util.Collections;
 public class Pathfinder {
 //    public static void main(String[] args) {
 //        Pathfinder pathfinder = new Pathfinder();
-//        ArrayList<Integer> path = pathfinder.nodePath(3, 20);
 //
-//        RouteOptions[] directions = pathfinder.pathDirections(path);
+//        int start = 3;
+//        int end = 20;
+//        RouteOptions[] directions = pathfinder.findPath(start, end);
+//        pathfinder.printDirections(start, end, directions);
 //
-//        System.out.println("\nDirections:");
-//        for (RouteOptions direction : directions) {
-//            System.out.println(direction);
-//        }
+//        System.out.println("\n");
+//
+//        pathfinder.addObstacle(5);
+//        pathfinder.addObstacle(2);
+//        pathfinder.addObstacle(4);
+//        directions = pathfinder.findPath(start, end);
+//        pathfinder.printDirections(start, end, directions);
 //    }
 
     private Node[] nodes;
+    private ArrayList<Integer> obstacles;
 
     public Pathfinder() {
+        this.nodes = MapSetter.setMap();
+        this.obstacles = new ArrayList<>();
+    }
+
+    private RouteOptions[] findPath(int startingPoint, int endPoint) {
+        ArrayList<Integer> path = this.nodePath(startingPoint, endPoint);
+
+        return this.pathDirections(path);
+    }
+
+    private void addObstacle(int obstaclePoint) {
+        if (!this.obstacles.contains(obstaclePoint))
+            this.obstacles.add(obstaclePoint);
+        for (Node node : nodes) {
+            node.removeNodeFromNeigbour(obstaclePoint);
+        }
+    }
+
+    private void resetMap() {
         this.nodes = MapSetter.setMap();
     }
 
     public ArrayList<Integer> nodePath(int startingPoint, int endPoint) {
-        System.out.println("Going from point\t" + startingPoint);
-        System.out.println("To point\t\t\t" + endPoint);
-
         // Breadth first search vanuit het startpunt
         int[] prev = solve(startingPoint);
 
@@ -73,7 +95,7 @@ public class Pathfinder {
 
         // Als er geen pad mogelijk is return een lege arraylist
         if (path.get(0) != startingPoint) {
-            System.out.println("kan niet");
+            System.out.println("Route niet mogelijk");
             return new ArrayList<>();
         }
 
@@ -82,6 +104,7 @@ public class Pathfinder {
 
     // Gaat ervan uit dat de bot al de juiste richting op kijkt
     public RouteOptions[] pathDirections(ArrayList<Integer> path) {
+        if (path.isEmpty()) return new RouteOptions[0];
 
         int[] directionCodes = new int[path.size() - 2];
 
@@ -129,5 +152,25 @@ public class Pathfinder {
         }
 
         return pathDirections;
+    }
+
+    private void printDirections(int startingPoint, int endPoint, RouteOptions[] route) {
+        if (route.length == 0) return;
+
+        System.out.println("Going from point\t" + startingPoint);
+        System.out.println("To point\t\t\t" + endPoint);
+
+        if (!this.obstacles.isEmpty()) {
+            System.out.println("\nObstacles");
+            for (Integer obstacle : this.obstacles) {
+                System.out.println(obstacle);
+            }
+        }
+
+
+        System.out.println("\nDirections");
+        for (RouteOptions routeOptions : route) {
+            System.out.println(routeOptions);
+        }
     }
 }
