@@ -3,11 +3,12 @@ package controllers;
 
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
-import hardware.led.NeoPixel;
+import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class LineFollower implements Callback, Updatable {
     private MovementController movementController;
@@ -16,16 +17,19 @@ public class LineFollower implements Callback, Updatable {
     private InfraRed leftSensor;
     private InfraRed middleSensor;
     private InfraRed rightSensor;
+    private Gripper gripper;
 
-    //
     private int lineDetection;
     private boolean isOnCrossover;
     private RouteOptions[] route;
     private int step;
 
+    private boolean isTurningAround;
+    private boolean isFinished;
+
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
-                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor) {
+                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper) {
         this.movementController = movementController;
         this.addDelay = addDelay;
         this.pathfinder = pathfinder;
@@ -33,16 +37,22 @@ public class LineFollower implements Callback, Updatable {
         this.middleSensor = middleSensor;
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
+        this.gripper = gripper;
 
         this.setCallbacks();
     }
 
     private void nextStep() {
-        if (this.step == this.route.length) {
-            System.out.println("laatste stap");
+//        if (this.step == this.route.length) {
+//            System.out.println("laatste stap");
+////            this.route = this.reverseRoute(this.route);
+//        }
+
+        if (!this.isFinished) {
+            if (this.step == this.route.length) this.isFinished = true;
+            this.step = (this.step + 1) % this.route.length;
         }
 
-        this.step = (this.step + 1) % this.route.length;
     }
 
     public void setRoute(int startingPoint, int endPoint) {
@@ -50,6 +60,16 @@ public class LineFollower implements Callback, Updatable {
 
         this.route = pathfinder.pathDirections(path);
         this.step = 0;
+    }
+
+    public void addRouteCommand(RouteOptions command) {
+        RouteOptions[] newRoute = Arrays.copyOf(this.route, this.route.length + 1);
+        newRoute[newRoute.length - 1] = command;
+        this.route = newRoute;
+
+        for (RouteOptions routeOptions : newRoute) {
+            System.out.println(routeOptions);
+        }
     }
 
     private void setCallbacks() {
@@ -73,39 +93,41 @@ public class LineFollower implements Callback, Updatable {
 
     @Override
     public void update() {
+        // Stop zodra hij heel de route heeft afgelegd
+        if (this.isFinished) return;
+
         switch (this.lineDetection) {
             case 0b000:
-//                System.out.println("geen detectie");
-//                this.movementController.stop();
-//                this.movementController.forward();
+                // GEEN DETECTIE (ziet wit)
+                if (this.step == this.route.length - 1 && !this.movementController.isTurning()) {
+                    this.movementController.stop();
+                    this.executeRouteCommand(this.route[this.step]);
+                }
                 break;
             case 0b001:
-//                System.out.println("Lijn alleen rechts");
+                // ALLEEN RECHTS DETECTIE
                 this.movementController.correctToTheRight();
                 break;
             case 0b010:
-//                System.out.println("Lijn alleen middel");
+                // ALLEEN MIDDEN DETECTIE
                 this.movementController.turnOffTurning();
                 this.movementController.forward();
                 break;
             case 0b011:
-//                System.out.println("Lijn middel en rechts");
-//                this.movementController.correctToTheRight();
+                // RECHTS EN MIDDEN DETECTIE
                 break;
             case 0b100:
-//                System.out.println("Lijn alleen links");
+                // ALLEEN LINKS DETECTIE
                 this.movementController.correctToTheLeft();
                 break;
             case 0b101:
-//                System.out.println("Lijn links en rechts");
+                // LINKS EN RECHTS DETECTIE
                 break;
             case 0b110:
-//                Syste     m.out.println("Lijn middel en links");
-//                this.movementController.correctToTheLeft();
+                // LINKS EN MIDDEN DETECTIE
                 break;
             case 0b111:
-//                this.movementController.turnRight();
-//                if (Math.random() >  0.000000000000001) break;
+                // KRUISPUNT
 
                 if (this.isOnCrossover) break;
                 System.out.println("KRUISPUNT!\tstap: " + this.step + "\t" + this.route[step]);
@@ -115,30 +137,7 @@ public class LineFollower implements Callback, Updatable {
                     this.isOnCrossover = false;
                 });
 
-                switch (this.route[this.step]) {
-                    case STRAIGHT:
-
-                        this.nextStep();
-                        break;
-                    case TURN_AROUND:
-                        this.movementController.turnAround();
-
-                        this.nextStep();
-                        break;
-                    case LEFT:
-                        this.movementController.turnLeft();
-
-                        this.nextStep();
-                        break;
-                    case RIGHT:
-                        this.movementController.turnRight();
-
-                        this.nextStep();
-                        break;
-                    default:
-                        System.out.println("Route error");
-                        break;
-                }
+                this.executeRouteCommand(this.route[this.step]);
                 break;
             default:
                 System.out.println("de lul lmao");
@@ -166,5 +165,44 @@ public class LineFollower implements Callback, Updatable {
         }
 
         return newRoute;
+    }
+
+    private void executeRouteCommand(RouteOptions command) {
+        switch (command) {
+            case NOTHING:
+                break;
+            case STRAIGHT:
+                this.nextStep();
+                break;
+            case LEFT:
+                this.movementController.turnLeft();
+
+                this.nextStep();
+                break;
+            case RIGHT:
+                this.movementController.turnRight();
+
+                this.nextStep();
+                break;
+            case TURN_AROUND:
+                this.movementController.turnAround();
+
+                this.nextStep();
+                break;
+            case PICK_UP:
+                this.movementController.turnAround();
+                this.gripper.close();
+                this.isTurningAround = true;
+
+                System.out.println("WOOOOOOOOOOOOO");
+
+                break;
+            case DROP:
+                this.gripper.open();
+                break;
+            default:
+                System.out.println("Route error");
+                break;
+        }
     }
 }

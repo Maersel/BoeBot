@@ -6,22 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Pathfinder {
-//    public static void main(String[] args) {
-//        Pathfinder pathfinder = new Pathfinder();
-//
-//        int start = 3;
-//        int end = 20;
-//        RouteOptions[] directions = pathfinder.findPath(start, end);
-//        pathfinder.printDirections(start, end, directions);
-//
-//        System.out.println("\n");
-//
-//        pathfinder.addObstacle(5);
-//        pathfinder.addObstacle(2);
-//        pathfinder.addObstacle(4);
-//        directions = pathfinder.findPath(start, end);
-//        pathfinder.printDirections(start, end, directions);
-//    }
+    public static void main(String[] args) {
+        Pathfinder pathfinder = new Pathfinder();
+
+        int start = 25;
+        int end = 14;
+        RouteOptions[] directions = pathfinder.findPath(start, end);
+        pathfinder.printDirections(start, end, directions);
+
+        System.out.println("\n");
+
+        pathfinder.addObstacle(7);
+        pathfinder.addObstacle(3);
+        directions = pathfinder.findPath(start, end);
+        pathfinder.printDirections(start, end, directions);
+    }
 
     private Node[] nodes;
     private ArrayList<Integer> obstacles;
@@ -87,8 +86,8 @@ public class Pathfinder {
         ArrayList<Integer> path = new ArrayList<>();
 
         // Vanuit het eindpunt terug kijken (path is achterstevoren)
-        for (int at = endPoint; at != 0; at = prev[at]) {
-            path.add(at);
+        for (int current = endPoint; current != 0; current = prev[current]) {
+            path.add(current);
         }
 
         Collections.reverse(path);
@@ -123,10 +122,39 @@ public class Pathfinder {
             }
 
             int front = (origin + 2) % 4;
-            int direction = target - front ;
+            int direction = (front - target) % 2;
+//            int direction = (front - (target % 2)) % 2;
+//            int direction = ((target % 2) - front) % 2;
 
+//            direction = ((target % 2) - front) % 2;
+
+//            direction = (target - origin);
+
+//            if (target == front) {
+//                direction = 0;
+//            } else if (target > front) {
+//                target = 1;
+//            } else {
+//                target = -1;
+//            }
+
+            if (origin == 3){
+                direction = (origin - target)%2;
+                if (target == 0) {
+                    direction = -1;
+                }
+            } else if (origin == 0){
+                direction = (origin - target)%2;
+                if (target == 3) {
+                    direction = 1;
+                }
+            } else {
+                direction = (origin - target)%2;
+            }
+
+//            System.out.println("Direction:\t" + direction);
             directionCodes[i - 1] = direction;
-//            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tTarget:\t" + target + "\tDirection:\t" + direction);
+            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tFront:" + front + "\tTarget:\t" + target + "\tDirection:\t" + direction);
         }
 
 
@@ -147,6 +175,9 @@ public class Pathfinder {
                 case 1:
                     direction = RouteOptions.RIGHT;
                     break;
+                default:
+                    System.out.println(directionCodes[i]);
+                    direction = RouteOptions.NOTHING;
             }
             pathDirections[i] = direction;
         }
