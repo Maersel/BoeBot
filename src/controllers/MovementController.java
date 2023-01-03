@@ -6,6 +6,9 @@ public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
 
+    private final int defaultSpeedRight = 29;
+    private final int defaultSpeedLeft = 30;
+
     private boolean isTurning;
 
     public MovementController(MovementMotor leftMotor, MovementMotor rightMotor) {
@@ -14,13 +17,13 @@ public class MovementController {
     }
 
     public void forward() {
-        this.leftMotor.goToSpeed(30);
-        this.rightMotor.goToSpeed(30);
+        this.leftMotor.goToSpeed(defaultSpeedLeft);
+        this.rightMotor.goToSpeed(defaultSpeedRight);
     }
 
     public void backwards() {
-        this.leftMotor.goToSpeed(-30);
-        this.rightMotor.goToSpeed(-30);
+        this.leftMotor.goToSpeed(-defaultSpeedRight);
+        this.rightMotor.goToSpeed(-defaultSpeedLeft);
     }
 
     public void stop() {
