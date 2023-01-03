@@ -101,34 +101,33 @@ public class GoatScarring implements Updatable, Callback {
     @Override
     public void onUltraSonic() {
         if (!isScaringGoats) {
-            System.out.println("if");
             isScaringGoats = true;
             movementController.stop();
 
             for (int i = 0; i < 3; i++) {
-                System.out.println("saoutttt");
-                int time = i * 6000;
+                int time = i * 6240;
 
+                time += 1560;
                 this.addDelay.addDelay("goat scare forwards", time, () -> {
                     this.movementController.forward();
                 });
 
-                time += 1000;
+                time += 1560;
                 this.addDelay.addDelay("goatscare stop", time, () -> {
                     this.movementController.stop();
                 });
 
-                time += 1000;
+                time += 1560;
                 this.addDelay.addDelay("goat scare backwards", time, () -> {
                     this.movementController.backwards();
                 });
 
-                time += 1000;
+                time += 1560;
                 this.addDelay.addDelay("goat scare stop", time, () -> {
                     this.movementController.stop();
                 });
             }
-            this.addDelay.addDelay("done scarring", 18000, () -> {
+            this.addDelay.addDelay("done scarring", 18720, () -> {
                 isScaringGoats = false;
             });
         }

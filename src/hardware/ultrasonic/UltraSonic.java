@@ -15,7 +15,7 @@ public class UltraSonic implements Updatable {
         this.pinEcho = pinEcho;
         this.pinTrigger = pinTrigger;
         this.callback = callback;
-        this.timer = new Timer(90);
+        this.timer = new Timer(20);
 
         BoeBot.setMode(this.pinEcho, PinMode.Input);
         BoeBot.setMode(this.pinTrigger, PinMode.Output);
@@ -25,7 +25,6 @@ public class UltraSonic implements Updatable {
     public void update() {
         if (timer.timeout() && closeObject()) {
             callback.onUltraSonic();
-
         }
     }
 
