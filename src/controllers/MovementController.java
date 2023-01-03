@@ -1,17 +1,21 @@
 package controllers;
 
+import hardware.led.NeoPixel;
 import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
 
 public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
+    private NeoPixel neoPixel;
+
 
     private boolean isTurning;
 
-    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor) {
+    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, NeoPixel neoPixel) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
+        this.neoPixel = neoPixel;
     }
 
     public void forward() {
@@ -56,9 +60,11 @@ public class MovementController {
     public void turnRight() {
         this.leftMotor.goToSpeed(-30);
         this.rightMotor.goToSpeed(30);
+        this.neoPixel.blinkingRight();
     }
     public void turnLeft() {
         this.leftMotor.goToSpeed(30);
         this.rightMotor.goToSpeed(-30);
+        this.neoPixel.blinkingLeft();
     }
 }

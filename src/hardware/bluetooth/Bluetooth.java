@@ -14,11 +14,12 @@ public class Bluetooth
     private final SerialConnection serial;
     private final MovementController movementController;
     private final Gripper gripper;
+    private final NeoPixel neoPixel;
 //    private final StateController stateController;
 //    private final Callback callback;
 
 
-    private final int forwardKey = 'e';
+    private final int forwardKey = 1;
     private final int backwardKey = 'd';
     private final int turnLeftKey = 's';
     private final int rightTurnKey = 'f';
@@ -39,11 +40,13 @@ public class Bluetooth
     public Bluetooth(SerialConnection serial
             , MovementController movementController
             , Gripper gripper
+            , NeoPixel neoPixel
 //            , StateController stateController, Callback callback
     ) {
         this.serial = serial;
         this.movementController = movementController;
         this.gripper = gripper;
+        this.neoPixel = neoPixel;
 //        this.stateController = stateController;
 //        this.callback = callback;
         t.mark();
@@ -72,28 +75,22 @@ public class Bluetooth
             if (data == forwardKey) {
                 movementController.forward();
                 System.out.println("forward");
-            }
-            else if (data == backwardKey) {
+            } else if (data == backwardKey) {
                 movementController.backwards();
                 System.out.println("backwards");
-            }
-            else if (data == correctLeftKey) {
+            } else if (data == correctLeftKey) {
                 movementController.correctLeft();
                 System.out.println("correctLeft");
-            }
-            else if (data == correctRightKey) {
+            } else if (data == correctRightKey) {
                 movementController.correctRight();
                 System.out.println("correctRight");
-            }
-            else if (data == boosyKey) {
+            } else if (data == boosyKey) {
                 movementController.boosy();
                 System.out.println("boosy");
-            }
-            else if (data == turnLeftKey) {
+            } else if (data == turnLeftKey) {
                 movementController.turnLeft();
                 System.out.println("turnLeft");
-            }
-            else if (data == rightTurnKey) {
+            } else if (data == rightTurnKey) {
                 movementController.turnRight();
                 System.out.println("turnRight");
             }
@@ -110,23 +107,24 @@ public class Bluetooth
             // ----- neopixels -----
             else if (data == neoPixeleKey1) {
                 if (neopixel != 1) {
-                    NeoPixel.setColour(1f, true);
+                    neoPixel.setColour(1f, true);
                     neopixel = 1;
                     neopixelOn = true;
                 } else {
                     neopixelOn = !neopixelOn;
-                    NeoPixel.setColour(1f, neopixelOn);
+                    neoPixel.setColour(1f, neopixelOn);
                 }
                 System.out.println("neoPixeleKey1");
             }
+
             else if (data == neoPixeleKey2) {
                 if (neopixel != 2) {
-                    NeoPixel.setColour(0.5f, true);
+                    neoPixel.setColour(0.5f, true);
                     neopixel = 2;
                     neopixelOn = true;
                 } else {
                     neopixelOn = !neopixelOn;
-                    NeoPixel.setColour(0.2f, neopixelOn);
+                    neoPixel.setColour(0.2f, neopixelOn);
                 }
                 System.out.println("neoPixeleKey2");
             }
@@ -137,26 +135,26 @@ public class Bluetooth
             else if (data == open) {
                 gripper.open();
                 System.out.println("open");
-            }
-            else if (data == close) {
+            } else if (data == close) {
                 gripper.close();
                 System.out.println("close");
             }
             // --------------------
 
-
-            else {
-                movementController.stop();
-                System.out.println("stop");
-            }
         }
         // lineFollowMode doet op het moment nog niks
-        else if (lineFollowMode) {}
+        else if (lineFollowMode) {
+        }
 
         // dit zorgt er voor dat je de besturings knoppen ingedrukt moet houden om de boebot te laten rijden
         else {
             if (t.timeout()) {
                 movementController.stop();
+
+                if (!neopixelOn){
+                    neoPixel.reset();
+                }
+
                 System.out.println("stop");
             }
         }

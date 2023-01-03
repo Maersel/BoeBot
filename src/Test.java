@@ -1,5 +1,6 @@
 import TI.BoeBot;
 import TI.SerialConnection;
+import TI.Timer;
 import controllers.MovementController;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
@@ -8,6 +9,7 @@ import hardware.led.NeoPixel;
 import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
 public class Test {
@@ -23,6 +25,9 @@ public class Test {
     public final int GRIPPER_PIN = 11;
     private Bluetooth bluetooth;
     private NeoPixel neoPixel;
+
+    private final Timer t1 = new Timer(800);
+    private final Timer t2 = new Timer(600);
 
 
     private ArrayList<Updatable> devices;
@@ -41,11 +46,12 @@ public class Test {
 
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
-        this.movementController = new controllers.MovementController(motorLeft, motorRight);
+        this.neoPixel = new NeoPixel(t1, t2, 0.05f);
+        this.movementController = new controllers.MovementController(motorLeft, motorRight, neoPixel);
         this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
-        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper);
-        this.neoPixel = new NeoPixel();
+        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper, new NeoPixel());
+
 
 
         this.devices = new ArrayList<>();
