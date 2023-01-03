@@ -22,8 +22,8 @@ public class MovementController {
     }
 
     public void backwards() {
-        this.leftMotor.goToSpeed(-defaultSpeedLeft);
-        this.rightMotor.goToSpeed(-defaultSpeedRight);
+        this.leftMotor.goToSpeed(-defaultSpeedRight);
+        this.rightMotor.goToSpeed(-defaultSpeedLeft);
     }
 
     public void stop() {
