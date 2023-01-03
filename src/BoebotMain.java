@@ -12,11 +12,11 @@ import hardware.motor.MovementMotor;
 import hardware.ultrasonic.UltraSonic;
 import hardware.whisker.Whisker;
 
-import java.rmi.Remote;
 import java.util.ArrayList;
 
-public class BoebotMain implements hardware.whisker.Callback, hardware.button.Callback,
-        hardware.ultrasonic.Callback {
+public class BoebotMain implements hardware.whisker.Callback, hardware.button.Callback
+        , AddDelay {
+
     public static void main(String[] args) {
         BoebotMain boebot = new BoebotMain();
         boebot.init();
@@ -60,7 +60,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private Buzzer buzzer;
 
-    private GoatScering goatScering;
+    private GoatScarring goatScering;
 
     private UltraSonic ultraSonic;
     private RemoteController remoteController;
@@ -95,9 +95,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScering(this.movementController, this.buzzer);
+        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
 
-        this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
+        this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this.goatScering);
 
         this.devices = new ArrayList<>();
 //        this.devices.add(this.gripperMotor);
@@ -125,24 +125,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.movementController.forward();
 
         while (true) {
-
-//            if (Math.random() < 0.0005) {
-//                if (Math.random() < 0.5) {
-//                    this.gripper.open();
-//                    System.out.println("open");
-//                } else {
-//                    this.gripper.close();
-//                    System.out.println("sluit");
-//                }
-//            }
-
-//            for (Updatable device : devices) {
-//                device.update();
-//            }
             for (int i = devices.size() - 1; i >= 0; i--) {
                 devices.get(i).update();
             }
-
             BoeBot.wait(1);
         }
     }
@@ -166,45 +151,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         }
     }
 
-    boolean isScaringGoats = false;
-
     @Override
-    public void onUltraSonic() {
-
-        if (!isScaringGoats) {
-            isScaringGoats = true;
-            movementController.stop();
-
-            for (int i = 0; i < 3; i++) {
-                int time = i * 4000;
-
-                this.addDelay("goat scare forwards", time, () -> {
-                    this.movementController.forward();
-                });
-
-                time += 1000;
-                this.addDelay("goatscare stop", time, () -> {
-                    this.movementController.stop();
-                });
-
-                time += 1000;
-                this.addDelay("goat scare backwards", time, () -> {
-                    this.movementController.backwards();
-                });
-
-                time += 1000;
-                this.addDelay("goat scare stop", time, () -> {
-                    this.movementController.stop();
-                });
-            }
-            this.addDelay("done scarring", 12000, () -> {
-                isScaringGoats= false;
-            });
-        }
-    }
-
-
     public void addDelay(String name, int time, TimerCallback callback) {
         this.devices.add(new Delay(name, this.devices, time, callback));
     }
+
 }
+
