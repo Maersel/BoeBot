@@ -10,6 +10,9 @@ public class MovementController {
     private NeoPixel neoPixel;
 
 
+    private final int defaultSpeedRight = 29;
+    private final int defaultSpeedLeft = 30;
+
     private boolean isTurning;
 
     public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, NeoPixel neoPixel) {
@@ -19,13 +22,14 @@ public class MovementController {
     }
 
     public void forward() {
-        this.leftMotor.goToSpeed(31);
-        this.rightMotor.goToSpeed(30);
+
+        this.leftMotor.goToSpeed(defaultSpeedLeft);
+        this.rightMotor.goToSpeed(defaultSpeedRight);
     }
 
     public void backwards() {
-        this.leftMotor.goToSpeed(-30);
-        this.rightMotor.goToSpeed(-30);
+        this.leftMotor.goToSpeed(-defaultSpeedRight);
+        this.rightMotor.goToSpeed(-defaultSpeedLeft);
     }
 
     public void stop() {

@@ -19,11 +19,11 @@ import hardware.motor.MovementMotor;
 import hardware.ultrasonic.UltraSonic;
 import hardware.whisker.Whisker;
 
-import java.rmi.Remote;
 import java.util.ArrayList;
 
-public class BoebotMain implements hardware.whisker.Callback, hardware.button.Callback,
-        hardware.ultrasonic.Callback {
+public class BoebotMain implements hardware.whisker.Callback, hardware.button.Callback
+        , AddDelay {
+
     public static void main(String[] args) {
         BoebotMain boebot = new BoebotMain();
         boebot.init();
@@ -70,7 +70,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private Buzzer buzzer;
 
-    private GoatScering goatScering;
+    private GoatScarring goatScering;
 
     private UltraSonic ultraSonic;
     private RemoteController remoteController;
@@ -106,13 +106,13 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScering(this.movementController, this.buzzer);
+        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
 
-        this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
+        this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this.goatScering);
 
 
         this.devices = new ArrayList<>();
-        this.devices.add(this.gripperMotor);
+//        this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
@@ -128,9 +128,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.sensorMiddle);
 //        this.devices.add(this.lineFollower);
 
-        this.devices.add(this.emergencyButton);
+//        this.devices.add(this.emergencyButton);
 
-        this.devices.add(this.buzzer);
+//        this.devices.add(this.buzzer);
 
         this.devices.add(this.ultraSonic);
     }
@@ -142,8 +142,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
 //            this.bluetooth.remote();
 
-            for (Updatable device : devices) {
-                device.update();
+            for (int i = devices.size() - 1; i >= 0; i--) {
+                devices.get(i).update();
             }
 
             BoeBot.wait(1);
@@ -169,45 +169,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         }
     }
 
-    boolean isScaringGoats = false;
-
     @Override
-    public void onUltraSonic() {
-        if (!isScaringGoats){
-
-//            movementController.stop();
-            movementController.emergencyStop();
-//            this.goatScering.push();
-
-//            this.devices.add(new Delay("goatscarer forward", this.devices, 1000, () -> {
-//                this.movementController.forward();
-//            }));
-//
-//            this.devices.add(new Delay("goatscarerer backwards", this.devices, 1500, () -> {
-//                this.movementController.backwards();
-//            }));
-//
-
-
-            this.addDelay("goatscare forwards", 1000, () -> {
-                this.movementController.forward();
-            });
-
-            this.addDelay("goatscare backwards", 1500, () -> {
-                this.movementController.backwards();
-            });
-
-            this.addDelay("goatscare stop", 2000, () -> {
-                this.movementController.stop();
-                isScaringGoats = false;
-
-            });
-
-            System.out.println("ultrsasoon");
-        }
-    }
-
     public void addDelay(String name, int time, TimerCallback callback) {
         this.devices.add(new Delay(name, this.devices, time, callback));
     }
+
 }
+
