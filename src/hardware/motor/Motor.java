@@ -6,7 +6,7 @@ import hardware.Updatable;
 public class Motor implements Updatable {
     private Servo servo;
     private int minSpeed;
-    private int maxSpeed;
+    protected int maxSpeed;
     protected int currentSpeed;
     protected int goalSpeed;
     protected int defaultSpeed;

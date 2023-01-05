@@ -40,8 +40,4 @@ public class MovementMotor extends Motor {
         else
             super.goalSpeed += amount;
     }
-
-    public void MMupdate() {
-        update();
-    }
 }

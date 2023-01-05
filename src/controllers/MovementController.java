@@ -2,27 +2,45 @@ package controllers;
 
 import hardware.led.NeoPixel;
 import hardware.motor.GripperMotor;
+
 import hardware.motor.MovementMotor;
 
 public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
+
     private NeoPixel neoPixel;
 
 
     private final int defaultSpeedRight = 29;
     private final int defaultSpeedLeft = 30;
 
-    private boolean isTurning;
+    private AddDelay addDelay;
 
-    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, NeoPixel neoPixel) {
+
+    private boolean isTurning;
+    private boolean turningDelay;
+
+
+
+    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay, NeoPixel neoPixel) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
-        this.neoPixel = neoPixel;
+        this.addDelay = delay;
+            this.neoPixel = neoPixel;
+    }
+
+    public boolean isTurning() {
+        return this.isTurning;
+    }
+
+    public void turnOffTurning() {
+        if (!this.turningDelay)
+            this.isTurning = false;
     }
 
     public void forward() {
-
+        if (isTurning) return;
         this.leftMotor.goToSpeed(defaultSpeedLeft);
         this.rightMotor.goToSpeed(defaultSpeedRight);
     }
@@ -42,18 +60,15 @@ public class MovementController {
         this.rightMotor.emergencyStop();
     }
 
-    public void correctLeft() {
-//        this.leftMotor.changeSpeed(-1);
-//        this.rightMotor.changeSpeed(1);
+    public void correctToTheRight() {
+        if (isTurning) return;
 
         this.rightMotor.goToSpeed(60);
         this.leftMotor.goToSpeed(10);
     }
 
-    public void correctRight() {
-//        this.leftMotor.changeSpeed(1);
-//        this.rightMotor.changeSpeed(-1);
-
+    public void correctToTheLeft() {
+        if (isTurning) return;
         this.leftMotor.goToSpeed(60);
         this.rightMotor.goToSpeed(10);
     }
@@ -64,18 +79,52 @@ public class MovementController {
     }
 
     public void turnRight() {
-        this.leftMotor.goToSpeed(-30);
-        this.rightMotor.goToSpeed(30);
-        this.neoPixel.blinkingRight();
+
+        if (!isTurning) {
+            System.out.println("turning right");
+            this.leftMotor.goToSpeed(0);
+            this.rightMotor.goToSpeed(75);
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(400);
+            this.neoPixel.blinkingRight();
+        }
     }
     public void turnLeft() {
-        this.leftMotor.goToSpeed(30);
-        this.rightMotor.goToSpeed(-30);
-        this.neoPixel.blinkingLeft();
+        if (!isTurning) {
+            System.out.println("turning left");
+            this.leftMotor.goToSpeed(75);
+            this.rightMotor.goToSpeed(0);
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(400);
+            this.neoPixel.blinkingLeft();
+        }
     }
 
-    public void update() {
-        rightMotor.MMupdate();
-        leftMotor.MMupdate();
+    public void turnAround() {
+        if (!isTurning) {
+            System.out.println("Turning around");
+
+            if (Math.random() > 0.5) {
+                this.leftMotor.goToSpeed(-30);
+                this.rightMotor.goToSpeed(30);
+            } else {
+                this.leftMotor.goToSpeed(30);
+                this.rightMotor.goToSpeed(-30);
+            }
+
+            this.isTurning = true;
+            this.turningDelay = true;
+            this.addTurningDelay(1500);
+        }
+    }
+
+    private void addTurningDelay(int time) {
+        this.addDelay.addDelay("Turning delay", time, () -> {
+            this.turningDelay = false;
+        });
     }
 }

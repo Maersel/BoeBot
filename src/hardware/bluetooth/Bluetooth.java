@@ -82,12 +82,17 @@ public class Bluetooth
             } else if (data == backwardKey) {
                 movementController.backwards();
                 System.out.println("backwards");
-            } else if (data == correctLeftKey) {
-                movementController.correctLeft();
+            }
+            else if (data == correctLeftKey)
+            {
+                movementController.correctToTheLeft();
                 System.out.println("correctLeft");
-            } else if (data == correctRightKey) {
-                movementController.correctRight();
+            }
+            else if (data == correctRightKey)
+            {
+                movementController.correctToTheRight();
                 System.out.println("correctRight");
+
             } else if (data == boosyKey) {
                 movementController.boosy();
                 System.out.println("boosy");
