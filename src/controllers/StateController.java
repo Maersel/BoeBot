@@ -39,7 +39,12 @@ public class StateController implements Updatable, Callback {
         } else if (ultraSonic.closeObject()) {
             this.state = Configuration.GOAT_SCARING_STATE;
             this.goatScare.turnOn();
+
         }
+//        else if (ultraSonic.isTooClose()) {
+//            this.state = Configuration.GOAT_SCARING_STATE;
+//            this.goatScare.turnOn();
+//        }
 
         if (this.state == Configuration.GOAT_SCARING_STATE) {
             if (goatScare.checkIfDone()) this.state = this.previousState;
@@ -49,5 +54,6 @@ public class StateController implements Updatable, Callback {
     @Override // wordt al gefilterd voordat het wordt opgeroepen
     public void onBlueToothInput(int input) {
         this.state = input;
+
     }
 }

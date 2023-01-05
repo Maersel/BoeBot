@@ -1,11 +1,18 @@
 import TI.BoeBot;
 import TI.PinMode;
+import TI.SerialConnection;
+import TI.Timer;
 import controllers.*;
+import controllers.LineFollower;
+import controllers.MovementController;
+import controllers.RemoteController;
+import controllers.StateController;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
 import hardware.buzzer.Buzzer;
 import hardware.gripper.Gripper;
+import hardware.led.NeoPixel;
 import hardware.linesensor.InfraRed;
 import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
@@ -44,6 +51,9 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private Gripper gripper;
     private GripperMotor gripperMotor;
 
+    private Bluetooth bluetooth;
+    private NeoPixel neoPixel;
+
     private MovementController movementController;
     private MovementMotor motorLeft;
     private MovementMotor motorRight;
@@ -66,8 +76,6 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     private RemoteController remoteController;
     private StateController stateController;
 
-    private Bluetooth bluetooth;
-
     public void init() {
         BoeBot.setMode(GRIPPER_PIN, PinMode.Output); // FIX
         BoeBot.setMode(EMERGENCY_BUTTON_PIN, PinMode.Input); // FIX
@@ -77,7 +85,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
-        this.movementController = new controllers.MovementController(motorLeft, motorRight);
+        this.movementController = new controllers.MovementController(motorLeft, motorRight, neoPixel);
+
+        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper, new NeoPixel());
+        this.neoPixel = new NeoPixel(new Timer(800), new Timer(600), 0.05f);
 
         this.whiskerLeft = new Whisker(WHISKER_PIN_LEFT, this);
         this.whiskerRight = new Whisker(WHISKER_PIN_RIGHT, this);
@@ -99,11 +110,14 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.ultraSonic = new UltraSonic(ULTRASONIC_ECHO_PIN, ULTRASONIC_TRIGGER_PIN, this);
 
+
         this.devices = new ArrayList<>();
         this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
+
+        this.devices.add(this.neoPixel);
 
 //        this.devices.add(this.whiskerLeft);
 //        this.devices.add(this.whiskerRight);
@@ -126,15 +140,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         while (true) {
 
-            if (Math.random() < 0.0005) {
-                if (Math.random() < 0.5) {
-                    this.gripper.open();
-                    System.out.println("open");
-                } else {
-                    this.gripper.close();
-                    System.out.println("sluit");
-                }
-            }
+//            this.bluetooth.remote();
 
             for (Updatable device : devices) {
                 device.update();
