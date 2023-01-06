@@ -76,7 +76,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private Buzzer buzzer;
 
-    private GoatScarring goatScering;
+    private GoatShooing goatgoatShooing;
 
     private UltraSonic ultraSonicFront;
     private UltraSonic ultraSonicRear;
@@ -91,13 +91,13 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.gripperMotor = new GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
+        this.neoPixel = new NeoPixel(new Timer(800), new Timer(600), 0.05f);
 
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight,this, neoPixel);
 
         this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper, new NeoPixel());
-        this.neoPixel = new NeoPixel(new Timer(800), new Timer(600), 0.05f);
 
         this.whiskerLeft = new Whisker(WHISKER_PIN_LEFT, this);
         this.whiskerRight = new Whisker(WHISKER_PIN_RIGHT, this);
@@ -115,50 +115,51 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
+        this.goatgoatShooing = new GoatShooing(this.movementController, this.buzzer, this);
 
-        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
+        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatgoatShooing);
 //        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this);
 
+        this.remoteController = new RemoteController(this.movementController, this.gripper);
 
         this.devices = new ArrayList<>();
-//        this.devices.add(this.gripperMotor);
+        this.devices.add(this.gripperMotor);
 
         this.devices.add(this.motorLeft);
         this.devices.add(this.motorRight);
-
-        this.devices.add(this.neoPixel);
+//
+//        this.devices.add(this.neoPixel);
 
 //        this.devices.add(this.whiskerLeft);
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-        this.devices.add(this.sensorLeft);
-        this.devices.add(this.sensorRight);
-        this.devices.add(this.sensorMiddle);
-        this.devices.add(this.lineFollower);
+//        this.devices.add(this.sensorLeft);
+//        this.devices.add(this.sensorRight);
+//        this.devices.add(this.sensorMiddle);
+//        this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
 
 //        this.devices.add(this.buzzer);
 
 //        this.devices.add(this.ultraSonicRear);
-        this.devices.add(this.ultraSonicFront);
+//        this.devices.add(this.ultraSonicFront);
 
 //        this.lineFollower.setRoute(8, 15);
 //        this.lineFollower.addRouteCommand(RouteOptions.PICK_UP);
+
+        this.devices.add(this.remoteController);
 
     }
 
     private void run() {
         while (true) {
-
 //            this.bluetooth.remote();
 
             for (int i = devices.size() - 1; i >= 0; i--) {
                 devices.get(i).update();
             }
-
             BoeBot.wait(1);
         }
     }
