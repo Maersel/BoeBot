@@ -1,7 +1,10 @@
 //import TI.BoeBot;
 //import TI.SerialConnection;
 //import TI.Timer;
+//import controllers.AddDelay;
+//import controllers.Delay;
 //import controllers.MovementController;
+//import controllers.TimerCallback;
 //import hardware.Updatable;
 //import hardware.bluetooth.Bluetooth;
 //import hardware.gripper.Gripper;
@@ -11,7 +14,7 @@
 //
 //import java.util.ArrayList;
 //
-//public class Test {
+//public class Test implements AddDelay {
 //
 //    public static void main(String[] args) {
 //        Test test = new Test();
@@ -41,7 +44,7 @@
 //        this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
 //        this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
 //        this.neoPixel = new NeoPixel(t1, t2, 0.05f);
-//        this.movementController = new controllers.MovementController(motorLeft, motorRight, neoPixel);
+//        this.movementController = new controllers.MovementController(motorLeft, motorRight, this , neoPixel);
 //        this.gripperMotor = new hardware.motor.GripperMotor(GRIPPER_PIN);
 //        this.gripper = new Gripper(gripperMotor);
 //        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper, new NeoPixel());
@@ -56,9 +59,9 @@
 //
 //    private void run() {
 //        while (true) {
-//            this.bluetooth.echoCode();
+////            this.bluetooth.echoCode();
 //
-//            this.bluetooth.remote();
+//
 //
 //            for (Updatable device : devices) {
 //                device.update();
@@ -68,4 +71,8 @@
 //
 //    }
 //
+//    @Override
+//    public void addDelay(String name, int time, TimerCallback callback) {
+//        this.devices.add(new Delay(name, this.devices, time, callback));
+//    }
 //}

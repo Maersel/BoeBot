@@ -9,7 +9,6 @@ public class MovementController {
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
 
-    private NeoPixel neoPixel;
 
 
     private final int defaultSpeedRight = 29;
@@ -23,11 +22,10 @@ public class MovementController {
 
 
 
-    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay, NeoPixel neoPixel) {
+    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.addDelay = delay;
-            this.neoPixel = neoPixel;
     }
 
     public boolean isTurning() {
@@ -88,7 +86,6 @@ public class MovementController {
             this.isTurning = true;
             this.turningDelay = true;
             this.addTurningDelay(400);
-            this.neoPixel.blinkingRight();
         }
     }
     public void turnLeft() {
@@ -100,7 +97,6 @@ public class MovementController {
             this.isTurning = true;
             this.turningDelay = true;
             this.addTurningDelay(400);
-            this.neoPixel.blinkingLeft();
         }
     }
 

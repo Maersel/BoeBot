@@ -9,15 +9,17 @@ public class Pathfinder {
     public static void main(String[] args) {
         Pathfinder pathfinder = new Pathfinder();
 
-        int start = 25;
-        int end = 14;
+        int start = 19;
+        int end = 25;
         RouteOptions[] directions = pathfinder.findPath(start, end);
         pathfinder.printDirections(start, end, directions);
 
         System.out.println("\n");
 
-        pathfinder.addObstacle(7);
-        pathfinder.addObstacle(3);
+        pathfinder.addObstacle(12);
+        pathfinder.addObstacle(4);
+        pathfinder.addObstacle(8);
+
         directions = pathfinder.findPath(start, end);
         pathfinder.printDirections(start, end, directions);
     }
