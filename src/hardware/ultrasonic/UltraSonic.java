@@ -15,8 +15,12 @@ public class UltraSonic implements Updatable {
         this.pinEcho = pinEcho;
         this.pinTrigger = pinTrigger;
         this.callback = callback;
-        this.timer = new Timer(20);
+        this.timer = new Timer(50);
 
+        this.setPins();
+    }
+
+    private void setPins() {
         BoeBot.setMode(this.pinEcho, PinMode.Input);
         BoeBot.setMode(this.pinTrigger, PinMode.Output);
     }
@@ -24,19 +28,15 @@ public class UltraSonic implements Updatable {
     @Override
     public void update() {
         if (timer.timeout()) {
-            callback.onUltraSonic((int) this.getDistance());
+            callback.onUltraSonic(this.getDistance());
         }
     }
 
-    private float getDistance() {
-
+    private int getDistance() {
         BoeBot.digitalWrite(pinTrigger, true);
-        BoeBot.uwait(1);           //Moet nog worden gefixed
+        BoeBot.uwait(1);
         BoeBot.digitalWrite(pinTrigger, false);
 
-        int rawDistance = BoeBot.pulseIn(pinEcho, true, 10000);
-        float distance = rawDistance / 58;     // Divide by 29.1 or multiply by 0.0343
-//        System.out.println("Ultra sonicdistance: " + distance);
-        return distance;
+        return (BoeBot.pulseIn(pinEcho, true, 10000) / 58);
     }
 }

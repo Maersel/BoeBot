@@ -69,13 +69,13 @@ public class MovementController {
     public void correctToTheRight() {
         if (isTurning) return;
 
-        this.rightMotor.goToSpeed(60);
+        this.rightMotor.goToSpeed(75);
         this.leftMotor.goToSpeed(10);
     }
 
     public void correctToTheLeft() {
         if (isTurning) return;
-        this.leftMotor.goToSpeed(60);
+        this.leftMotor.goToSpeed(75);
         this.rightMotor.goToSpeed(10);
     }
 

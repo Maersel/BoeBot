@@ -51,55 +51,20 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     }
 
     private void nextStep() {
-//        if (this.step == this.route.length) {
-//            System.out.println("laatste stap");
-////            this.route = this.reverseRoute(this.route);
-//        }
-
-//        System.out.println("Current:\t" + this.step + "\t\tmax:\t" + (this.route.length - 1));
-
-        if (!this.isFinished) {
-            if (this.step == this.route.length) this.isFinished = true;
-            if (this.step == this.route.length - 1) this.isOnLastAction = true;
-            if (this.step == this.route.length - 2) this.isOnSecondToLastAction = true;
-            this.step = (this.step + 1);
-        }
+        this.step++;
     }
 
-    public void setRoute(int startingPoint, int endPoint) {
+    public void setRoute(int startingPoint, int endPoint, RouteOptions pickUpOrDrop) {
         ArrayList<Integer> path = pathfinder.nodePath(startingPoint, endPoint);
-
         this.route = pathfinder.pathDirections(path);
-        this.step = 0;
-    }
 
-    public void routePickUp() {
-        if (hasEndGoal) return;
-        this.hasEndGoal = true;
-        this.appendRouteCommand(RouteOptions.PICK_UP);
-    }
-
-    public void routeDrop() {
-        if (hasEndGoal) return;
-        this.hasEndGoal = true;
-        this.prependRouteCommand(RouteOptions.PICK_UP);
-        this.appendRouteCommand(RouteOptions.DROP);
-    }
-
-    private void appendRouteCommand(RouteOptions command) {
-        RouteOptions[] newRoute = Arrays.copyOf(this.route, this.route.length + 1);
-        newRoute[newRoute.length - 1] = command;
-        this.route = newRoute;
-    }
-
-    private void prependRouteCommand(RouteOptions command) {
-        RouteOptions[] newRoute = new RouteOptions[this.route.length + 1];
-        for (int i = 0; i < this.route.length; i++) {
-            newRoute[i + 1] = this.route[i];
+        if (pickUpOrDrop == RouteOptions.PICK_UP) {
+            this.route = pathfinder.routePickUp(this.route);
+        } else if (pickUpOrDrop == RouteOptions.DROP) {
+            this.route = pathfinder.routeDrop(this.route);
         }
 
-        newRoute[0] = command;
-        this.route = newRoute;
+        this.step = 0;
     }
 
     public void printRoute() {
@@ -107,11 +72,11 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
             System.out.println(routeOptions);
         }
 
-        System.out.println("\nNieuw\n");
-
-        for (RouteOptions routeOptions : this.reverseRoute(this.route)) {
-            System.out.println(routeOptions);
-        }
+//        System.out.println("\nNieuw\n");
+//
+//        for (RouteOptions routeOptions : this.reverseRoute(this.route)) {
+//            System.out.println(routeOptions);
+//        }
     }
 
     private void setCallbacks() {
@@ -135,98 +100,29 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
 
     @Override
     public void update() {
-        // Stop zodra hij heel de route heeft afgelegd
-        if (this.isFinished) {
-            System.out.println("KLAAR");
-            return;
-        }
-
-        System.out.println(this.step);
-
-        // Moet 3 keer achter elkaar niks lezen (tegen foute metingen)
-        if (this.lineDetection != 0) this.noLines = 0;
-
         switch (this.lineDetection) {
             case 0b000:
-                // GEEN DETECTIE (ziet wit)
-                if (this.step == this.route.length - 1 && !this.movementController.isTurning()) {
-
-                    this.noLines++;
-                    System.out.println(this.noLines);
-
-                    if (noLines > 20) {
-                        System.out.println("?");
-                        this.movementController.stop();
-                        this.executeRouteCommand(this.route[this.step]);
-
-                        this.nextStep();
-                    }
-                } else if (this.isFinished) {
-                    this.movementController.stop();
-                }
                 break;
             case 0b001:
-                // ALLEEN RECHTS DETECTIE
-                if (isOnLastAction) return;
                 this.movementController.correctToTheRight();
                 break;
             case 0b010:
-                // ALLEEN MIDDEN DETECTIE
-                this.movementController.turnOffTurning();
-
-                if (!this.isFinished) {
-                    this.movementController.forward();
-
-                    if (this.isOnSecondToLastAction) {
-                        this.movementController.slowForward();
-                    }
-
-                    if (this.isOnLastAction) {
-//                        this.movementController.forward();
-//                        this.addDelay.addDelay("forward correct", 150, () -> {
-                            this.movementController.backwards();
-//                            this.nextStep();
-//                        });
-                    }
-                }
-
-
+                this.movementController.forward();
                 break;
             case 0b011:
-                // RECHTS EN MIDDEN DETECTIE
                 break;
             case 0b100:
-                // ALLEEN LINKS DETECTIE
-                if (isOnLastAction) return;
                 this.movementController.correctToTheLeft();
                 break;
             case 0b101:
-                // LINKS EN RECHTS DETECTIE
                 break;
             case 0b110:
-                // LINKS EN MIDDEN DETECTIE
                 break;
-            case 0b111:
-                // KRUISPUNT
-                this.movementController.turnOffTurning();
-
-                if (this.isOnCrossover) break;
-                if (this.isOnLastAction) this.movementController.backwards();
-
-                if (this.step == this.route.length) break;
-
-                System.out.println("KRUISPUNT!\tstap: " + this.step + "\t" + this.route[step]);
-
-                this.isOnCrossover = true;
-                this.addDelay.addDelay("Crossing crossover", 400, () -> {
-                    this.isOnCrossover = false;
-                });
-
-                this.executeRouteCommand(this.route[this.step]);
+            case 0b111: // Kruispunt
+                System.out.println("Kruispunt");
                 break;
             default:
-                System.out.println("de lul lmao");
-                System.out.println(Integer.toBinaryString(lineDetection));
+                System.out.println("ERROR: \t" + Integer.toBinaryString(this.lineDetection));
                 break;
         }
 
@@ -326,14 +222,5 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
 
     @Override
     public void onUltraSonic(int distance) {
-        if (distance > 3 || distance < 1) return;
-        if (!isOnLastAction) return;
-//        if (!isFinished) return;
-
-        this.addDelay.addDelay("extra achteruit", 50, () -> {
-            this.movementController.stop();
-            this.gripper.close();
-        });
-        this.nextStep();
     }
 }

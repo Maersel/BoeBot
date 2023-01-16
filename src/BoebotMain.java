@@ -5,8 +5,8 @@ import TI.Timer;
 import controllers.*;
 import controllers.LineFollower;
 import controllers.MovementController;
-import controllers.RemoteController;
-import controllers.StateController;
+//import controllers.RemoteController;
+//import controllers.StateController;
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
@@ -76,12 +76,12 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
     private Buzzer buzzer;
 
-    private GoatScarring goatScering;
+//    private GoatScarring goatScering;
 
     private UltraSonic ultraSonicFront;
     private UltraSonic ultraSonicRear;
-    private RemoteController remoteController;
-    private StateController stateController;
+//    private RemoteController remoteController;
+//    private StateController stateController;
 
     public void init() {
         this.pathfinder = new Pathfinder();
@@ -110,14 +110,14 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
-        this.stateController = new StateController(this.lineFollower, this.movementController,
-                this.bluetooth, this.ultraSonicFront);
+//        this.stateController = new StateController(this.lineFollower, this.movementController,
+//                this.bluetooth, this.ultraSonicFront);
 
         this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
+//        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
 
-        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
+//        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
         this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this.lineFollower);
 
 
@@ -145,9 +145,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices.add(this.ultraSonicRear);
 //        this.devices.add(this.ultraSonicFront);
 
-        this.lineFollower.setRoute(13, 28);
-        this.lineFollower.routePickUp();
-//        this.lineFollower.routeDrop();
+        this.lineFollower.setRoute(13, 28, RouteOptions.PICK_UP);
 
         this.lineFollower.printRoute();
     }
