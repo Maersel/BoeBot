@@ -23,8 +23,8 @@ public class UltraSonic implements Updatable {
 
     @Override
     public void update() {
-        if (timer.timeout() && closeObject()) {
-            callback.onUltraSonic();
+        if (timer.timeout()) {
+            callback.onUltraSonic((int) this.getDistance());
         }
     }
 
@@ -38,11 +38,5 @@ public class UltraSonic implements Updatable {
         float distance = rawDistance / 58;     // Divide by 29.1 or multiply by 0.0343
 //        System.out.println("Ultra sonicdistance: " + distance);
         return distance;
-    }
-
-    public boolean closeObject() {
-        float distance = this.getDistance();
-        return (distance <= 15 && distance >= 3);
-
     }
 }

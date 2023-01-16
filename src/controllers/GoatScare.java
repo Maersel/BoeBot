@@ -30,12 +30,12 @@ public class GoatScare implements Updatable {
         return false;
     }
 
-    public void scaringMethod(){
-        if (this.ultraSonic.closeObject()){
-            this.turnOn();
-        }
-
-    }
+//    public void scaringMethod(){
+//        if (this.ultraSonic.closeObject()){
+//            this.turnOn();
+//        }
+//
+//    }
 
     @Override
     public void update() {

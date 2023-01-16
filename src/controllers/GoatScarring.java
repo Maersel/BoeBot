@@ -99,7 +99,7 @@ public class GoatScarring implements Updatable, Callback {
     }
 
     @Override
-    public void onUltraSonic() {
+    public void onUltraSonic(int distance) {
         if (!isScaringGoats) {
             isScaringGoats = true;
             movementController.stop();

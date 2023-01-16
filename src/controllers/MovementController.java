@@ -45,6 +45,12 @@ public class MovementController {
         this.rightMotor.goToSpeed(defaultSpeedRight);
     }
 
+    public void slowForward() {
+        if (isTurning) return;
+        this.leftMotor.goToSpeed(15);
+        this.rightMotor.goToSpeed(15);
+    }
+
     public void backwards() {
         this.leftMotor.goToSpeed(-defaultSpeedRight);
         this.rightMotor.goToSpeed(-defaultSpeedLeft);

@@ -91,13 +91,13 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
         this.gripperMotor = new GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
+        this.neoPixel = new NeoPixel(new Timer(800), new Timer(600), 0.05f);
 
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight,this, neoPixel);
 
         this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this.gripper, new NeoPixel());
-        this.neoPixel = new NeoPixel(new Timer(800), new Timer(600), 0.05f);
 
         this.whiskerLeft = new Whisker(WHISKER_PIN_LEFT, this);
         this.whiskerRight = new Whisker(WHISKER_PIN_RIGHT, this);
@@ -118,14 +118,14 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
 
         this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
-//        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this);
+        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this.lineFollower);
 
 
         this.devices = new ArrayList<>();
-//        this.devices.add(this.gripperMotor);
+        this.devices.add(this.gripperMotor);
 
-//        this.devices.add(this.motorLeft);
-//        this.devices.add(this.motorRight);
+        this.devices.add(this.motorLeft);
+        this.devices.add(this.motorRight);
 //
 //        this.devices.add(this.neoPixel);
 
@@ -133,24 +133,23 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-//        this.devices.add(this.sensorLeft);
-//        this.devices.add(this.sensorRight);
-//        this.devices.add(this.sensorMiddle);
+        this.devices.add(this.sensorLeft);
+        this.devices.add(this.sensorRight);
+        this.devices.add(this.sensorMiddle);
         this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
 
 //        this.devices.add(this.buzzer);
 
-//        this.devices.add(this.ultraSonicRear);
+        this.devices.add(this.ultraSonicRear);
 //        this.devices.add(this.ultraSonicFront);
 
-        this.lineFollower.setRoute(15, 27);
-//        this.lineFollower.routePickUp();
+        this.lineFollower.setRoute(22, 15);
+        this.lineFollower.routePickUp();
 //        this.lineFollower.routeDrop();
 
         this.lineFollower.printRoute();
-
     }
 
     private void run() {

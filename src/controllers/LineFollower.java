@@ -6,15 +6,12 @@ import hardware.Updatable;
 import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
-import javafx.scene.input.PickResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static controllers.RouteOptions.STRAIGHT;
-
-public class LineFollower implements Callback, Updatable {
+public class LineFollower implements Callback, hardware.ultrasonic.Callback, Updatable {
     private MovementController movementController;
     private AddDelay addDelay;
     private Pathfinder pathfinder;
@@ -30,7 +27,11 @@ public class LineFollower implements Callback, Updatable {
 
     private boolean isTurningAround;
     private boolean isFinished;
+    private boolean isOnLastAction;
+    private boolean isOnSecondToLastAction;
     private boolean hasEndGoal;
+
+    private int noLines;
 
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
@@ -49,22 +50,19 @@ public class LineFollower implements Callback, Updatable {
     }
 
     private void nextStep() {
-
-        ArrayList<RouteOptions[]> queue = new ArrayList<>();
-
-        queue.add(this.route);
-        queue.add(this.reverseRoute(this.route));
-        queue.add(this.route);
 //        if (this.step == this.route.length) {
 //            System.out.println("laatste stap");
 ////            this.route = this.reverseRoute(this.route);
 //        }
 
+//        System.out.println("Current:\t" + this.step + "\t\tmax:\t" + (this.route.length - 1));
+
         if (!this.isFinished) {
             if (this.step == this.route.length) this.isFinished = true;
-            this.step = (this.step + 1) % this.route.length;
+            if (this.step == this.route.length - 1) this.isOnLastAction = true;
+            if (this.step == this.route.length - 2) this.isOnSecondToLastAction = true;
+            this.step = (this.step + 1) ;
         }
-
     }
 
     public void setRoute(int startingPoint, int endPoint) {
@@ -137,14 +135,31 @@ public class LineFollower implements Callback, Updatable {
     @Override
     public void update() {
         // Stop zodra hij heel de route heeft afgelegd
-        if (this.isFinished) return;
+        if (this.isFinished) {
+//            System.out.println("KLAAR");
+            return;
+        }
+
+        // Moet 3 keer achter elkaar niks lezen (tegen foute metingen)
+        if (this.lineDetection != 0) this.noLines = 0;
 
         switch (this.lineDetection) {
             case 0b000:
                 // GEEN DETECTIE (ziet wit)
                 if (this.step == this.route.length - 1 && !this.movementController.isTurning()) {
+
+                    this.noLines++;
+                    System.out.println(this.noLines);
+
+                    if (noLines > 20) {
+                        System.out.println("?");
+                        this.movementController.stop();
+                        this.executeRouteCommand(this.route[this.step]);
+
+                        this.nextStep();
+                    }
+                } else if (this.isFinished) {
                     this.movementController.stop();
-                    this.executeRouteCommand(this.route[this.step]);
                 }
                 break;
             case 0b001:
@@ -154,7 +169,24 @@ public class LineFollower implements Callback, Updatable {
             case 0b010:
                 // ALLEEN MIDDEN DETECTIE
                 this.movementController.turnOffTurning();
-                this.movementController.forward();
+
+                if (!this.isFinished) {
+                    this.movementController.forward();
+
+                    if (this.isOnSecondToLastAction) {
+                        this.movementController.slowForward();
+                    }
+
+                    if (this.isOnLastAction) {
+                        this.movementController.forward();
+                        this.addDelay.addDelay("forward correct", 150, () -> {
+                            this.movementController.backwards();
+                            this.nextStep();
+                        });
+                    }
+                }
+
+
                 break;
             case 0b011:
                 // RECHTS EN MIDDEN DETECTIE
@@ -264,11 +296,10 @@ public class LineFollower implements Callback, Updatable {
                 break;
             case PICK_UP:
                 this.movementController.turnAround();
-                this.gripper.close();
-                this.isTurningAround = true;
+//                this.gripper.close();
+//                this.isTurningAround = true;
 
-                System.out.println("WOOOOOOOOOOOOO");
-
+//                System.out.println("WOOOOOOOOOOOOO");
                 break;
             case DROP:
                 this.gripper.open();
@@ -277,5 +308,17 @@ public class LineFollower implements Callback, Updatable {
                 System.out.println("Route error");
                 break;
         }
+    }
+
+    @Override
+    public void onUltraSonic(int distance) {
+        if (distance > 3 || distance < 1) return;
+        if (!isOnLastAction) return;
+
+        this.addDelay.addDelay("extra achteruit", 50, () -> {
+            this.movementController.stop();
+            this.gripper.close();
+            this.nextStep();
+        });
     }
 }
