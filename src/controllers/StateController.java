@@ -24,14 +24,13 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     private int previousState;
 
     public final int GRIPPER_PIN = 0;
+
     public final int MOTOR_PIN_LEFT = 12;
     public final int MOTOR_PIN_RIGHT = 13;
-    public final int SENSOR_PIN_LEFT = 1;
-    public final int SENSOR_PIN_RIGHT = 3;
-    public final int SENSOR_PIN_MIDDLE = 2;
 
-    public final int WHISKER_PIN_LEFT = 0;
-    public final int WHISKER_PIN_RIGHT = 1;
+    public final int SENSOR_PIN_LEFT = 1;
+    public final int SENSOR_PIN_MIDDLE = 2;
+    public final int SENSOR_PIN_RIGHT = 3;
 
     public final int EMERGENCY_BUTTON_PIN = 0;
 
@@ -259,7 +258,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
             }
 
             for (int i = allwaysOnDevices.size() - 1; i >= 0; i--) {
-                devices.get(i).update();
+                allwaysOnDevices.get(i).update();
             }
 
             BoeBot.wait(1);

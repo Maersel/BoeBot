@@ -50,7 +50,6 @@ public class Bluetooth implements Updatable
         this.lineFollower = lineFollower;
         this.gripper = gripper;
         this.neoPixel = neoPixel;
-
     }
 
 
