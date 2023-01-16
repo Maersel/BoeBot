@@ -63,13 +63,13 @@ public class MovementController {
     public void correctToTheRight() {
         if (isTurning) return;
 
-        this.rightMotor.goToSpeed(60);
+        this.rightMotor.goToSpeed(50);
         this.leftMotor.goToSpeed(10);
     }
 
     public void correctToTheLeft() {
         if (isTurning) return;
-        this.leftMotor.goToSpeed(60);
+        this.leftMotor.goToSpeed(50);
         this.rightMotor.goToSpeed(10);
     }
 
@@ -82,7 +82,7 @@ public class MovementController {
 
         if (!isTurning) {
             System.out.println("turning right");
-            this.leftMotor.goToSpeed(0);
+            this.leftMotor.goToSpeed(5);
             this.rightMotor.goToSpeed(75);
 
             this.isTurning = true;
@@ -95,7 +95,7 @@ public class MovementController {
         if (!isTurning) {
             System.out.println("turning left");
             this.leftMotor.goToSpeed(75);
-            this.rightMotor.goToSpeed(0);
+            this.rightMotor.goToSpeed(5);
 
             this.isTurning = true;
             this.turningDelay = true;

@@ -96,8 +96,9 @@ public class GoatShooing implements Updatable, Callback {
     }
 
     @Override
-    public void onUltraSonic() {
-        if (!isShooingGoats) {
+    public void onUltraSonic(int distance) {
+        if (!isShooingGoats && distance < 15 && distance > 3) {
+            System.out.println(distance);
             isShooingGoats = true;
             movementController.stop();
 

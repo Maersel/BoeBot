@@ -23,12 +23,12 @@ public class UltraSonic implements Updatable {
 
     @Override
     public void update() {
-        if (timer.timeout() && closeObject()) {
-            callback.onUltraSonic();
+        if (timer.timeout()){
+            callback.onUltraSonic((int) this.getDistance());
         }
     }
 
-    private float getDistance() {
+    public float getDistance() {
 
         BoeBot.digitalWrite(pinTrigger, true);
         BoeBot.uwait(1);           //Moet nog worden gefixed
@@ -40,9 +40,9 @@ public class UltraSonic implements Updatable {
         return distance;
     }
 
-    public boolean closeObject() {
-        float distance = this.getDistance();
-        return (distance <= 15 && distance >= 3);
+//    public boolean closeObject() {
+//        float distance = this.getDistance();
+//        return (distance <= 15 && distance >= 3);
 
-    }
+//    }
 }

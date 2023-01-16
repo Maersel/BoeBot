@@ -36,7 +36,7 @@ public class StateController implements Updatable, Callback {
         if (emergencyButton.buttonPressed()) {
             this.state = Configuration.EMERGENCY_STATE;
             this.movementController.emergencyStop();
-        } else if (ultraSonic.closeObject()) {
+        } else if (ultraSonic.getDistance()< 15) {
             this.state = Configuration.GOAT_SCARING_STATE;
             this.goatScare.turnOn();
 
