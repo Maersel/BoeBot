@@ -79,7 +79,6 @@ public class MovementController {
     }
 
     public void turnRight() {
-
         if (!isTurning) {
             System.out.println("turning right");
             this.leftMotor.goToSpeed(0);

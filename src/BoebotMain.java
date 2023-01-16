@@ -124,18 +124,18 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices = new ArrayList<>();
 //        this.devices.add(this.gripperMotor);
 
-        this.devices.add(this.motorLeft);
-        this.devices.add(this.motorRight);
-
-        this.devices.add(this.neoPixel);
+//        this.devices.add(this.motorLeft);
+//        this.devices.add(this.motorRight);
+//
+//        this.devices.add(this.neoPixel);
 
 //        this.devices.add(this.whiskerLeft);
 //        this.devices.add(this.whiskerRight);
 
         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-        this.devices.add(this.sensorLeft);
-        this.devices.add(this.sensorRight);
-        this.devices.add(this.sensorMiddle);
+//        this.devices.add(this.sensorLeft);
+//        this.devices.add(this.sensorRight);
+//        this.devices.add(this.sensorMiddle);
         this.devices.add(this.lineFollower);
 
 //        this.devices.add(this.emergencyButton);
@@ -143,10 +143,13 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //        this.devices.add(this.buzzer);
 
 //        this.devices.add(this.ultraSonicRear);
-        this.devices.add(this.ultraSonicFront);
+//        this.devices.add(this.ultraSonicFront);
 
-//        this.lineFollower.setRoute(8, 15);
-//        this.lineFollower.addRouteCommand(RouteOptions.PICK_UP);
+        this.lineFollower.setRoute(15, 27);
+//        this.lineFollower.routePickUp();
+//        this.lineFollower.routeDrop();
+
+        this.lineFollower.printRoute();
 
     }
 

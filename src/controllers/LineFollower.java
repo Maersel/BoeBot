@@ -6,9 +6,13 @@ import hardware.Updatable;
 import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
+import javafx.scene.input.PickResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+
+import static controllers.RouteOptions.STRAIGHT;
 
 public class LineFollower implements Callback, Updatable {
     private MovementController movementController;
@@ -26,6 +30,7 @@ public class LineFollower implements Callback, Updatable {
 
     private boolean isTurningAround;
     private boolean isFinished;
+    private boolean hasEndGoal;
 
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
@@ -38,11 +43,18 @@ public class LineFollower implements Callback, Updatable {
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
         this.gripper = gripper;
+        this.hasEndGoal = false;
 
         this.setCallbacks();
     }
 
     private void nextStep() {
+
+        ArrayList<RouteOptions[]> queue = new ArrayList<>();
+
+        queue.add(this.route);
+        queue.add(this.reverseRoute(this.route));
+        queue.add(this.route);
 //        if (this.step == this.route.length) {
 //            System.out.println("laatste stap");
 ////            this.route = this.reverseRoute(this.route);
@@ -62,12 +74,43 @@ public class LineFollower implements Callback, Updatable {
         this.step = 0;
     }
 
-    public void addRouteCommand(RouteOptions command) {
+    public void routePickUp() {
+        if (hasEndGoal) return;
+        this.hasEndGoal = true;
+        this.appendRouteCommand(RouteOptions.PICK_UP);
+    }
+
+    public void routeDrop() {
+        if (hasEndGoal) return;
+        this.hasEndGoal = true;
+        this.prependRouteCommand(RouteOptions.PICK_UP);
+        this.appendRouteCommand(RouteOptions.DROP);
+    }
+
+    private void appendRouteCommand(RouteOptions command) {
         RouteOptions[] newRoute = Arrays.copyOf(this.route, this.route.length + 1);
         newRoute[newRoute.length - 1] = command;
         this.route = newRoute;
+    }
 
-        for (RouteOptions routeOptions : newRoute) {
+    private void prependRouteCommand(RouteOptions command) {
+        RouteOptions[] newRoute = new RouteOptions[this.route.length + 1];
+        for (int i = 0; i < this.route.length; i++) {
+            newRoute[i + 1] = this.route[i];
+        }
+
+        newRoute[0] = command;
+        this.route = newRoute;
+    }
+
+    public void printRoute() {
+        for (RouteOptions routeOptions : this.route) {
+            System.out.println(routeOptions);
+        }
+
+        System.out.println("\nNieuw\n");
+
+        for (RouteOptions routeOptions : this.reverseRoute(this.route)) {
             System.out.println(routeOptions);
         }
     }
@@ -153,16 +196,46 @@ public class LineFollower implements Callback, Updatable {
 
         for (int i = 0; i < route.length; i++) {
             switch (route[i]) {
+                case STRAIGHT:
+                    newRoute[i] = route[i];
+                    break;
                 case LEFT:
-                    newRoute[route.length - i - 1] = RouteOptions.RIGHT;
+                    newRoute[i] = RouteOptions.RIGHT;
                     break;
                 case RIGHT:
-                    newRoute[route.length - i - 1] = RouteOptions.LEFT;
+                    newRoute[i] = RouteOptions.LEFT;
                     break;
-                default:
-                    newRoute[route.length - i - 1] = route[i];
+                case PICK_UP:
+                    newRoute[i] = RouteOptions.DROP;
+                    break;
+                case DROP:
+                    newRoute[i] = RouteOptions.NOTHING;
+                    break;
             }
         }
+
+        RouteOptions[] tempRoute;
+
+        if (newRoute[newRoute.length - 1] == RouteOptions.NOTHING) {
+            tempRoute = new RouteOptions[route.length - 2];
+            for (int i = 1; i < newRoute.length - 1; i++) {
+                tempRoute[i - 1] = newRoute[i];
+            }
+
+            newRoute = Arrays.copyOf(newRoute, newRoute.length - 1);
+        } else {
+            tempRoute = new RouteOptions[route.length];
+            tempRoute[0] = newRoute[newRoute.length - 1];
+
+            for (int i = 0; i < newRoute.length - 1; i++) {
+                tempRoute[i + 1] = newRoute[i];
+            }
+            newRoute = tempRoute;
+        }
+
+        newRoute = tempRoute;
+
+        Collections.reverse(Arrays.asList(newRoute));
 
         return newRoute;
     }

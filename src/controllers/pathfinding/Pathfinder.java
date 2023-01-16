@@ -154,7 +154,7 @@ public class Pathfinder {
 
 //            System.out.println("Direction:\t" + direction);
             directionCodes[i - 1] = direction;
-            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tFront:" + front + "\tTarget:\t" + target + "\tDirection:\t" + direction);
+//            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tFront:" + front + "\tTarget:\t" + target + "\tDirection:\t" + direction);
         }
 
 
