@@ -87,8 +87,8 @@ public class MovementController {
     public void turnRight() {
         if (!isTurning) {
             System.out.println("turning right");
-            this.leftMotor.goToSpeed(0);
-            this.rightMotor.goToSpeed(75);
+            this.leftMotor.goToSpeed(-20);
+            this.rightMotor.goToSpeed(50);
 
             this.isTurning = true;
             this.turningDelay = true;
@@ -99,8 +99,8 @@ public class MovementController {
     public void turnLeft() {
         if (!isTurning) {
             System.out.println("turning left");
-            this.leftMotor.goToSpeed(75);
-            this.rightMotor.goToSpeed(0);
+            this.leftMotor.goToSpeed(50);
+            this.rightMotor.goToSpeed(-20);
 
             this.isTurning = true;
             this.turningDelay = true;
@@ -123,7 +123,7 @@ public class MovementController {
 
             this.isTurning = true;
             this.turningDelay = true;
-            this.addTurningDelay(1500);
+            this.addTurningDelay(2000);
         }
     }
 

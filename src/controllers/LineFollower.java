@@ -1,6 +1,7 @@
 
 package controllers;
 
+import TI.BoeBot;
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.gripper.Gripper;
@@ -61,7 +62,7 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
             if (this.step == this.route.length) this.isFinished = true;
             if (this.step == this.route.length - 1) this.isOnLastAction = true;
             if (this.step == this.route.length - 2) this.isOnSecondToLastAction = true;
-            this.step = (this.step + 1) ;
+            this.step = (this.step + 1);
         }
     }
 
@@ -136,9 +137,11 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     public void update() {
         // Stop zodra hij heel de route heeft afgelegd
         if (this.isFinished) {
-//            System.out.println("KLAAR");
+            System.out.println("KLAAR");
             return;
         }
+
+        System.out.println(this.step);
 
         // Moet 3 keer achter elkaar niks lezen (tegen foute metingen)
         if (this.lineDetection != 0) this.noLines = 0;
@@ -164,6 +167,7 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 break;
             case 0b001:
                 // ALLEEN RECHTS DETECTIE
+                if (isOnLastAction) return;
                 this.movementController.correctToTheRight();
                 break;
             case 0b010:
@@ -178,11 +182,11 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                     }
 
                     if (this.isOnLastAction) {
-                        this.movementController.forward();
-                        this.addDelay.addDelay("forward correct", 150, () -> {
+//                        this.movementController.forward();
+//                        this.addDelay.addDelay("forward correct", 150, () -> {
                             this.movementController.backwards();
-                            this.nextStep();
-                        });
+//                            this.nextStep();
+//                        });
                     }
                 }
 
@@ -193,6 +197,7 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 break;
             case 0b100:
                 // ALLEEN LINKS DETECTIE
+                if (isOnLastAction) return;
                 this.movementController.correctToTheLeft();
                 break;
             case 0b101:
@@ -203,8 +208,13 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 break;
             case 0b111:
                 // KRUISPUNT
+                this.movementController.turnOffTurning();
 
                 if (this.isOnCrossover) break;
+                if (this.isOnLastAction) this.movementController.backwards();
+
+                if (this.step == this.route.length) break;
+
                 System.out.println("KRUISPUNT!\tstap: " + this.step + "\t" + this.route[step]);
 
                 this.isOnCrossover = true;
@@ -295,7 +305,11 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 this.nextStep();
                 break;
             case PICK_UP:
-                this.movementController.turnAround();
+                this.movementController.backwards();
+
+                this.addDelay.addDelay("BACKWARDS", 100, () -> {
+                    this.movementController.turnAround();
+                });
 //                this.gripper.close();
 //                this.isTurningAround = true;
 
@@ -314,11 +328,12 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     public void onUltraSonic(int distance) {
         if (distance > 3 || distance < 1) return;
         if (!isOnLastAction) return;
+//        if (!isFinished) return;
 
         this.addDelay.addDelay("extra achteruit", 50, () -> {
             this.movementController.stop();
             this.gripper.close();
-            this.nextStep();
         });
+        this.nextStep();
     }
 }
