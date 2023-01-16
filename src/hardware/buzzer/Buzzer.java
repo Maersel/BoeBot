@@ -14,7 +14,7 @@ public class Buzzer implements Updatable {
     private boolean isTurnedOn;
 
     public Buzzer(int pin) {
-        System.out.println("Buzzer constr");
+//        System.out.println("Buzzer constr");
         this.pin = pin;
         this.firstPing = true;
         this.isTurnedOn = false;

@@ -93,6 +93,7 @@ public class LineFollower implements Callback, Updatable {
 
     @Override
     public void update() {
+
         // Stop zodra hij heel de route heeft afgelegd
         if (this.isFinished) return;
 
@@ -128,7 +129,6 @@ public class LineFollower implements Callback, Updatable {
                 break;
             case 0b111:
                 // KRUISPUNT
-
                 if (this.isOnCrossover) break;
                 System.out.println("KRUISPUNT!\tstap: " + this.step + "\t" + this.route[step]);
 

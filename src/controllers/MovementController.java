@@ -118,6 +118,16 @@ public class MovementController {
         }
     }
 
+    public void remoteTurnLeft() {
+        this.rightMotor.goToSpeed(-30);
+        this.leftMotor.goToSpeed(30);
+    }
+
+    public void remoteTurnRight() {
+        this.rightMotor.goToSpeed(30);
+        this.leftMotor.goToSpeed(-30);
+    }
+
     private void addTurningDelay(int time) {
         this.addDelay.addDelay("Turning delay", time, () -> {
             this.turningDelay = false;

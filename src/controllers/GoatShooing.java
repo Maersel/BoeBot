@@ -1,15 +1,12 @@
 package controllers;
 
 
-import TI.BoeBot;
 import TI.Timer;
 import hardware.Updatable;
 import hardware.buzzer.Buzzer;
-import hardware.motor.MovementMotor;
 import hardware.ultrasonic.Callback;
-import hardware.ultrasonic.UltraSonic;
 
-public class GoatScarring implements Updatable, Callback {
+public class GoatShooing implements Updatable, Callback {
     private MovementController movementController;
     private Timer timer;
     private Timer timer1;
@@ -17,14 +14,14 @@ public class GoatScarring implements Updatable, Callback {
     private Buzzer buzzer;
     private boolean moving;
     private boolean isTurnedOn;
-    private boolean isScaringGoats = false;
+    private boolean isShooingGoats = false;
     private AddDelay addDelay;
 
-    public GoatScarring(MovementController movementController, Buzzer buzzer, AddDelay addDelay) {
+    public GoatShooing(MovementController movementController, Buzzer buzzer, AddDelay addDelay) {
         this.movementController = movementController;
-        this.timer = new Timer(6000);
-        this.timer1 = new Timer(2000);
-        this.timer2 = new Timer(4000);
+//        this.timer = new Timer(6000);
+//        this.timer1 = new Timer(2000);
+//        this.timer2 = new Timer(4000);
         this.buzzer = buzzer;
         this.moving = false;
         this.addDelay = addDelay;
@@ -42,18 +39,18 @@ public class GoatScarring implements Updatable, Callback {
         this.isTurnedOn = false;
     }
 
-    private void markTimers() {
-        this.timer.mark();
-        this.timer1.mark();
-        this.timer2.mark();
-    }
+//    private void markTimers() {
+//        this.timer.mark();
+//        this.timer1.mark();
+//        this.timer2.mark();
+//    }
 
-    public void push() {
-        this.moving = true;
-        this.markTimers();
-
-        movementController.forward();
-        System.out.println("forward");
+//    public void push() {
+//        this.moving = true;
+//        this.markTimers();
+//
+//        movementController.forward();
+//        System.out.println("forward");
 //        while (moving) {
 //
 //
@@ -72,7 +69,7 @@ public class GoatScarring implements Updatable, Callback {
 //            movementController.update();
 //            BoeBot.wait(1);
 //        }
-    }
+//    }
 
     @Override
     public void update() {
@@ -100,35 +97,35 @@ public class GoatScarring implements Updatable, Callback {
 
     @Override
     public void onUltraSonic() {
-        if (!isScaringGoats) {
-            isScaringGoats = true;
+        if (!isShooingGoats) {
+            isShooingGoats = true;
             movementController.stop();
 
             for (int i = 0; i < 3; i++) {
                 int time = i * 6240;
 
                 time += 1560;
-                this.addDelay.addDelay("goat scare forwards", time, () -> {
+                this.addDelay.addDelay("goat shooing forwards", time, () -> {
                     this.movementController.forward();
                 });
 
                 time += 1560;
-                this.addDelay.addDelay("goatscare stop", time, () -> {
+                this.addDelay.addDelay("goat shooing stop", time, () -> {
                     this.movementController.stop();
                 });
 
                 time += 1560;
-                this.addDelay.addDelay("goat scare backwards", time, () -> {
+                this.addDelay.addDelay("goat shooing backwards", time, () -> {
                     this.movementController.backwards();
                 });
 
                 time += 1560;
-                this.addDelay.addDelay("goat scare stop", time, () -> {
+                this.addDelay.addDelay("goat shooing stop", time, () -> {
                     this.movementController.stop();
                 });
             }
-            this.addDelay.addDelay("done scarring", 18720, () -> {
-                isScaringGoats = false;
+            this.addDelay.addDelay("done shooing", 18720, () -> {
+                isShooingGoats = false;
             });
         }
     }
