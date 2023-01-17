@@ -11,6 +11,7 @@ public class PickUpDropController implements Updatable, Callback {
     private LineFollowerCallback callback;
 
     private RouteOptions target;
+    private RouteOptions turningDirection;
     private boolean hasTurnedAround;
     private boolean isTurnedOn;
     private boolean isCloseEnough;
@@ -59,11 +60,10 @@ public class PickUpDropController implements Updatable, Callback {
                 if (this.doingTheThing && this.isCloseEnough) {
                     this.movementController.stop();
                     this.gripper.close();
-                    System.out.println("payload wordt true gezet");
                     this.hasPayload = true;
                 }
 
-                System.out.println(this.hasPayload + "\t" + this.gripper.isClosed());
+//                System.out.println(this.hasPayload + "\t" + this.gripper.isClosed());
 
                 if (this.hasPayload && gripper.isClosed()) {
                     System.out.println("BEGIN OPNIEUW");
@@ -75,22 +75,21 @@ public class PickUpDropController implements Updatable, Callback {
 
 
             if (this.target == RouteOptions.DROP) {
-                System.out.println("NU DROPPEN");
                 if (!this.gripper.isClosed() && !this.doingTheThing) this.gripper.close();
 
                 this.turnAround();
                 this.lineCorrection();
 
-                if (this.doingTheThing) {
+                if (this.doingTheThing && this.hasPayload) {
                     this.addDelay.addDelay("temp", 1000, () -> {
                         this.movementController.stop();
                         this.gripper.open();
-                        this.hasPayload = false;
                     });
-
+                    this.hasPayload = false;
                 }
 
                 if (!this.hasPayload && gripper.isOpen()) {
+                    System.out.println("TURN OFF");
                     this.callback.returnToStart();
                     this.turnOff();
                 }
@@ -101,7 +100,7 @@ public class PickUpDropController implements Updatable, Callback {
 
     private void turnAround() {
         if (!hasTurnedAround) {
-            this.movementController.turnAround();
+            this.turningDirection = this.movementController.turnAround();
             this.hasTurnedAround = true;
         }
     }
@@ -110,8 +109,14 @@ public class PickUpDropController implements Updatable, Callback {
         // Als hij klaar is met draaien
         if (!this.movementController.isTurning() && this.hasTurnedAround && !this.doingTheThing) {
             this.doingTheThing = true;
-            this.movementController.forward();
-            this.addDelay.addDelay("Vooruit correctie", 200, () -> {
+
+            if (this.turningDirection == RouteOptions.LEFT) {
+                this.movementController.correctToTheLeft();
+            } else if (this.turningDirection == RouteOptions.RIGHT) {
+                this.movementController.correctToTheRight();
+            }
+
+            this.addDelay.addDelay("180 correctie", 400, () -> {
                 this.movementController.backwards();
             });
         }

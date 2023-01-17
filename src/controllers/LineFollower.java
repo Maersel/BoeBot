@@ -112,6 +112,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     @Override
     public void update() {
 //        System.out.println(Integer.toBinaryString(this.lineDetection));
+        if (isFinished) return;
 
         if (this.isOnLastAction) {
             this.pickUpDropController.turnOn((this.route[this.route.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
@@ -130,7 +131,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                 if (hasPassedLastCrossover && !this.movementController.isTurning()) {
                     this.noLines++;
 
-                    if (this.noLines > 20)
+                    if (this.noLines > 30)
                         this.isOnLastAction = true;
                 }
                 break;
@@ -266,8 +267,11 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     @Override
     public void returnToStart() {
+        if (this.isReturning) {
+            this.isFinished = true;
+            return;
+        }
         System.out.println("RETURNING???");
-        if (this.isReturning) return;
 
         this.isReturning = true;
         this.route = this.reverseRoute(this.route);

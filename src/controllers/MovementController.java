@@ -105,20 +105,24 @@ public class MovementController {
         }
     }
 
-    public void turnAround() {
+    public RouteOptions turnAround() {
+        RouteOptions direction = RouteOptions.NOTHING;
         if (!isTurning) {
             System.out.println("Turning around");
 
             if (Math.random() > 0.5) {
                 this.leftMotor.goToSpeed(-30);
                 this.rightMotor.goToSpeed(30);
+                direction = RouteOptions.LEFT;
             } else {
                 this.leftMotor.goToSpeed(30);
                 this.rightMotor.goToSpeed(-30);
+                direction = RouteOptions.RIGHT;
             }
 
             this.addTurningDelay(2000);
         }
+        return direction;
     }
 
     private void addTurningDelay(int time) {

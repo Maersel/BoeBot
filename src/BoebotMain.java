@@ -149,7 +149,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices.add(this.ultraSonicRear);
 //        this.devices.add(this.ultraSonicFront);
 
-        this.lineFollower.setRoute(15, 13, RouteOptions.PICK_UP);
+        this.lineFollower.setRoute(13, 15, RouteOptions.PICK_UP);
         this.lineFollower.printRoute();
 
         this.lineFollower.setPickUpDropController(this.pickUpDropController);
