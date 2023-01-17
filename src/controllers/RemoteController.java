@@ -7,11 +7,13 @@ import hardware.gripper.Gripper;
 
 public class RemoteController implements Updatable {
     private MovementController movementController;
+    private StateController stateController;
     private Gripper gripper;
 
 
-    public RemoteController(MovementController movementController, Gripper gripper) {
+    public RemoteController(MovementController movementController, StateController stateController, Gripper gripper) {
         this.movementController = movementController;
+        this.stateController = stateController;
         this.gripper = gripper;
     }
 

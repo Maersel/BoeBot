@@ -6,6 +6,7 @@ import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
 
 public class MovementController {
+    private StateController stateController;
     private MovementMotor leftMotor;
     private MovementMotor rightMotor;
 
@@ -23,6 +24,7 @@ public class MovementController {
 
 
     public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay) {
+        this.stateController = stateController;
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.addDelay = delay;

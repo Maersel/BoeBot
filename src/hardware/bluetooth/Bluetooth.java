@@ -14,7 +14,7 @@ public class Bluetooth implements Updatable
 //        implements CheckState
 {
 
-    private final SerialConnection serial;
+    private final SerialConnection serial = new SerialConnection();
     private final MovementController movementController;
     private final StateController stateController;
     private final LineFollower lineFollower;
@@ -27,7 +27,7 @@ public class Bluetooth implements Updatable
     private boolean remoteMode = false;
     // ------------------
 
-    private int alpha;
+    private int alpha = 0;
 
     private int neopixelId = 0;
     private boolean neopixelOn = false;
@@ -36,15 +36,14 @@ public class Bluetooth implements Updatable
 
     private int point1;
     private int point2;
+    private int mode;
 
-    public Bluetooth(SerialConnection serial
-            , MovementController movementController
+    public Bluetooth(MovementController movementController
             , StateController stateController
             , LineFollower lineFollower
             , Gripper gripper
             , NeoPixel neoPixel
     ) {
-        this.serial = serial;
         this.movementController = movementController;
         this.stateController = stateController;
         this.lineFollower = lineFollower;
@@ -78,16 +77,29 @@ public class Bluetooth implements Updatable
                     System.out.println("mapMode = false\tremoteMode = true");
                 }
 
-                if (data <= 26) {
+                if (data <= 45) {
                     if (alpha == 0) {
-
+                        point1 = data;
+                        alpha++;
+                    } else if (alpha == 1) {
+                        point2 = data;
+                        alpha++;
+                    } else if (alpha == 2) {
+                        mode = data;
+                        alpha++;
                     }
+                    if (alpha == 3) {
+//                        lineFollower.setRoute(point1, point2);
+//                        if (mode == 41){
+//
+//                        } else if (mode == 42){
+//                        }
+//                        stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
+                        alpha = 0;
+                        System.out.println(point1 + "\t" + point2 + "\t" + mode);
+                    }
+                }
 
-                }
-                if (alpha == 2){
-                    lineFollower.setRoute(point1, point2);
-                    stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
-                }
             }
 
             if (remoteMode) {
@@ -131,27 +143,27 @@ public class Bluetooth implements Updatable
 
 
                 // ----- neopixels -----
-                else if (data == 111) {
-                    if (neopixelId != 1) {
-                        neoPixel.setColour(1f, true);
-                        neopixelId = 1;
-                        neopixelOn = true;
-                    } else {
-                        neopixelOn = !neopixelOn;
-                        neoPixel.setColour(1f, neopixelOn);
-                    }
-                    System.out.println("neoPixeleKey1");
-                } else if (data == 112) {
-                    if (neopixelId != 2) {
-                        neoPixel.setColour(0.5f, true);
-                        neopixelId = 2;
-                        neopixelOn = true;
-                    } else {
-                        neopixelOn = !neopixelOn;
-                        neoPixel.setColour(0.2f, neopixelOn);
-                    }
-                    System.out.println("neoPixeleKey2");
-                }
+//                else if (data == 111) {
+//                    if (neopixelId != 1) {
+//                        neoPixel.setColour(1f, true);
+//                        neopixelId = 1;
+//                        neopixelOn = true;
+//                    } else {
+//                        neopixelOn = !neopixelOn;
+//                        neoPixel.setColour(1f, neopixelOn);
+//                    }
+//                    System.out.println("neoPixeleKey1");
+//                } else if (data == 112) {
+//                    if (neopixelId != 2) {
+//                        neoPixel.setColour(0.5f, true);
+//                        neopixelId = 2;
+//                        neopixelOn = true;
+//                    } else {
+//                        neopixelOn = !neopixelOn;
+//                        neoPixel.setColour(0.2f, neopixelOn);
+//                    }
+//                    System.out.println("neoPixeleKey2");
+//                }
                 // --------------------
 
 

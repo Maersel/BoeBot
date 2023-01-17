@@ -3,7 +3,6 @@ package controllers;
 import TI.BoeBot;
 import TI.PinMode;
 import TI.SerialConnection;
-import TI.Timer;
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
@@ -20,7 +19,7 @@ import hardware.whisker.Whisker;
 import java.util.ArrayList;
 
 public class StateController implements Updatable, AddDelay, hardware.button.Callback {
-    private int state = 0;
+    private int state = 1;
     private int previousState;
 
     public final int GRIPPER_PIN = 0;
@@ -61,7 +60,6 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     private GripperMotor gripperMotor;
 
     private Bluetooth bluetooth;
-    private NeoPixel neoPixel;
 
     private MovementController movementController;
     private MovementMotor motorLeft;
@@ -79,7 +77,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
     private Buzzer buzzer;
 
-    private GoatScarring goatScering;
+    private GoatShooing goatShooing;
 
     private UltraSonic ultraSonicFront;
     private UltraSonic ultraSonicRear;
@@ -102,7 +100,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight, this);
 
-        this.bluetooth = new Bluetooth(new SerialConnection(), this.movementController, this, this.lineFollower, this.gripper, new NeoPixel());
+        this.bluetooth = new Bluetooth(this.movementController, this, this.lineFollower, this.gripper, null);
 
         this.sensorLeft = new InfraRed(SENSOR_PIN_LEFT);
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
@@ -115,9 +113,9 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
 //        this.buzzer = new Buzzer(BUZZER_PIN);
 
-        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
+        this.goatShooing = new GoatShooing(this.movementController, this.buzzer, this);
 
-        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
+        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatShooing);
 //        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this);
 
         /**
