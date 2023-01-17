@@ -33,6 +33,9 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private boolean hasEndGoal;
     private boolean hasPassedLastCrossover;
 
+    private boolean premove;
+    private boolean isPremoving;
+
     private boolean isReturning;
 
     private int noLines;
@@ -113,6 +116,21 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     public void update() {
 //        System.out.println(Integer.toBinaryString(this.lineDetection));
         if (isFinished) return;
+
+        if (this.route[0] == RouteOptions.PICK_UP && !this.premove) {
+            this.premove = true;
+            this.isPremoving = true;
+
+            this.pickUpDropController.turnOn(this.route[0]);
+            this.pickUpDropController.forcehasTurnedAround();
+
+            this.nextStep();
+        }
+
+        if (this.isPremoving) {
+            this.lineDetection = 0;
+            return;
+        }
 
         if (this.isOnLastAction) {
             this.pickUpDropController.turnOn((this.route[this.route.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
@@ -246,15 +264,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                 this.nextStep();
                 break;
             case PICK_UP:
-//                this.movementController.backwards();
-//
-//                this.addDelay.addDelay("BACKWARDS", 100, () -> {
-//                    this.movementController.turnAround();
-//                });
-//                this.gripper.close();
-//                this.isTurningAround = true;
-
-//                System.out.println("WOOOOOOOOOOOOO");
+                System.out.println("PICK UP AAAAAAAAAAAA");
                 break;
             case DROP:
 //                this.gripper.open();
@@ -268,7 +278,13 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     @Override
     public void returnToStart() {
         if (this.isReturning) {
+            System.out.println("KLAAARRRRRRR");
             this.isFinished = true;
+            return;
+        }
+
+        if (this.isPremoving) {
+            this.isPremoving = false;
             return;
         }
         System.out.println("RETURNING???");

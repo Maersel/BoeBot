@@ -46,6 +46,11 @@ public class PickUpDropController implements Updatable, Callback {
         this.target = null;
     }
 
+    public void forcehasTurnedAround() {
+        this.hasTurnedAround = true;
+        this.turningDirection = RouteOptions.NOTHING;
+    }
+
     @Override
     public void update() {
         if (this.isTurnedOn) {
@@ -109,6 +114,8 @@ public class PickUpDropController implements Updatable, Callback {
         // Als hij klaar is met draaien
         if (!this.movementController.isTurning() && this.hasTurnedAround && !this.doingTheThing) {
             this.doingTheThing = true;
+
+            this.movementController.backwards();
 
             if (this.turningDirection == RouteOptions.LEFT) {
                 this.movementController.correctToTheLeft();
