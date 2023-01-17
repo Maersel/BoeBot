@@ -18,7 +18,6 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private InfraRed leftSensor;
     private InfraRed middleSensor;
     private InfraRed rightSensor;
-    private Gripper gripper;
     private PickUpDropController pickUpDropController;
 
     private int lineDetection;
@@ -26,11 +25,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private RouteOptions[] route;
     private int step;
 
-    private boolean isTurningAround;
     private boolean isFinished;
     private boolean isOnLastAction;
-    private boolean isOnSecondToLastAction;
-    private boolean hasEndGoal;
     private boolean hasPassedLastCrossover;
 
     private boolean premove;
@@ -50,8 +46,6 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         this.middleSensor = middleSensor;
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
-        this.gripper = gripper;
-        this.hasEndGoal = false;
 
         this.setCallbacks();
     }
