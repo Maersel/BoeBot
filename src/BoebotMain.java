@@ -83,6 +83,8 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 //    private RemoteController remoteController;
 //    private StateController stateController;
 
+    private PickUpDropController pickUpDropController;
+
     public void init() {
         this.pathfinder = new Pathfinder();
 
@@ -106,7 +108,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper);
+        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.pickUpDropController);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
@@ -117,9 +119,11 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
 
 //        this.goatScering = new GoatScarring(this.movementController, this.buzzer, this);
 
-//        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
-        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this.lineFollower);
 
+//        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatScering);
+        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this.pickUpDropController);
+
+        this.pickUpDropController = new PickUpDropController(this.movementController, this, this.gripper, this.lineFollower);
 
         this.devices = new ArrayList<>();
         this.devices.add(this.gripperMotor);
@@ -145,13 +149,27 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices.add(this.ultraSonicRear);
 //        this.devices.add(this.ultraSonicFront);
 
-        this.lineFollower.setRoute(13, 28, RouteOptions.PICK_UP);
-
+        this.lineFollower.setRoute(15, 13, RouteOptions.PICK_UP);
         this.lineFollower.printRoute();
+
+        this.lineFollower.setPickUpDropController(this.pickUpDropController);
+        this.ultraSonicRear.setCallback(this.pickUpDropController);
+
+        this.devices.add(this.pickUpDropController);
     }
 
     private void run() {
+        Timer t = new Timer(7500);
+
         while (true) {
+//            if (t.timeout()) {
+//                System.out.println("Doe iets");
+//                if (this.gripper.isOpen()) {
+//                    this.gripper.close();
+//                } else if (this.gripper.isClosed()) {
+//                    this.gripper.open();
+//                }
+//            }
 
 //            this.bluetooth.remote();
 

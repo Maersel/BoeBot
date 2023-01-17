@@ -25,6 +25,10 @@ public class UltraSonic implements Updatable {
         BoeBot.setMode(this.pinTrigger, PinMode.Output);
     }
 
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
     @Override
     public void update() {
         if (timer.timeout()) {
@@ -32,7 +36,7 @@ public class UltraSonic implements Updatable {
         }
     }
 
-    private int getDistance() {
+    public int getDistance() {
         BoeBot.digitalWrite(pinTrigger, true);
         BoeBot.uwait(1);
         BoeBot.digitalWrite(pinTrigger, false);

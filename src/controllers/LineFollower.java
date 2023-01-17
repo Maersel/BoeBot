@@ -1,7 +1,6 @@
 
 package controllers;
 
-import TI.BoeBot;
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.gripper.Gripper;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class LineFollower implements Callback, hardware.ultrasonic.Callback, Updatable {
+public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private MovementController movementController;
     private AddDelay addDelay;
     private Pathfinder pathfinder;
@@ -20,6 +19,7 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     private InfraRed middleSensor;
     private InfraRed rightSensor;
     private Gripper gripper;
+    private PickUpDropController pickUpDropController;
 
     private int lineDetection;
     private boolean isOnCrossover;
@@ -31,12 +31,15 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     private boolean isOnLastAction;
     private boolean isOnSecondToLastAction;
     private boolean hasEndGoal;
+    private boolean hasPassedLastCrossover;
+
+    private boolean isReturning;
 
     private int noLines;
 
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
-                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper) {
+                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper, PickUpDropController pickUpDropController) {
         this.movementController = movementController;
         this.addDelay = addDelay;
         this.pathfinder = pathfinder;
@@ -51,6 +54,10 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     }
 
     private void nextStep() {
+//        System.out.println("Current step:\t" + this.step + "\tmax: " + this.route.leng
+        System.out.println("Current step: \t" + this.step + "\t" + this.route[this.step]);
+
+        if (this.step == this.route.length - 2) this.hasPassedLastCrossover = true;
         this.step++;
     }
 
@@ -79,6 +86,10 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
 //        }
     }
 
+    public void setPickUpDropController(PickUpDropController pickUpDropController) {
+        this.pickUpDropController = pickUpDropController;
+    }
+
     private void setCallbacks() {
         this.leftSensor.setCallback(this);
         this.middleSensor.setCallback(this);
@@ -100,13 +111,34 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
 
     @Override
     public void update() {
+//        System.out.println(Integer.toBinaryString(this.lineDetection));
+
+        if (this.isOnLastAction) {
+            this.pickUpDropController.turnOn((this.route[this.route.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
+
+            // mogelijk een probleem later
+            if (this.lineDetection == 0b010 || this.lineDetection == 0b111) this.movementController.turnOffTurning();
+
+            this.lineDetection = 0;
+            return;
+        }
+
+        if (this.lineDetection != 0b000) this.noLines = 0;
+
         switch (this.lineDetection) {
             case 0b000:
+                if (hasPassedLastCrossover && !this.movementController.isTurning()) {
+                    this.noLines++;
+
+                    if (this.noLines > 20)
+                        this.isOnLastAction = true;
+                }
                 break;
             case 0b001:
                 this.movementController.correctToTheRight();
                 break;
             case 0b010:
+                if (this.movementController.isTurning())this.movementController.turnOffTurning();
                 this.movementController.forward();
                 break;
             case 0b011:
@@ -119,7 +151,15 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
             case 0b110:
                 break;
             case 0b111: // Kruispunt
+                if (isOnCrossover) break;
                 System.out.println("Kruispunt");
+
+                this.isOnCrossover = true;
+                this.addDelay.addDelay("Crossover delay", 400, () -> {
+                    this.isOnCrossover = false;
+                });
+
+                this.executeRouteCommand(this.route[this.step]);
                 break;
             default:
                 System.out.println("ERROR: \t" + Integer.toBinaryString(this.lineDetection));
@@ -186,12 +226,16 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 this.nextStep();
                 break;
             case LEFT:
-                this.movementController.turnLeft();
+                this.addDelay.addDelay("extra turning delay", 500, () -> {
+                    this.movementController.turnLeft();
+                });
 
                 this.nextStep();
                 break;
             case RIGHT:
-                this.movementController.turnRight();
+                this.addDelay.addDelay("extra turning delay", 500, () -> {
+                    this.movementController.turnRight();
+                });
 
                 this.nextStep();
                 break;
@@ -201,18 +245,18 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
                 this.nextStep();
                 break;
             case PICK_UP:
-                this.movementController.backwards();
-
-                this.addDelay.addDelay("BACKWARDS", 100, () -> {
-                    this.movementController.turnAround();
-                });
+//                this.movementController.backwards();
+//
+//                this.addDelay.addDelay("BACKWARDS", 100, () -> {
+//                    this.movementController.turnAround();
+//                });
 //                this.gripper.close();
 //                this.isTurningAround = true;
 
 //                System.out.println("WOOOOOOOOOOOOO");
                 break;
             case DROP:
-                this.gripper.open();
+//                this.gripper.open();
                 break;
             default:
                 System.out.println("Route error");
@@ -221,6 +265,25 @@ public class LineFollower implements Callback, hardware.ultrasonic.Callback, Upd
     }
 
     @Override
-    public void onUltraSonic(int distance) {
+    public void returnToStart() {
+        System.out.println("RETURNING???");
+        if (this.isReturning) return;
+
+        this.isReturning = true;
+        this.route = this.reverseRoute(this.route);
+        this.step = 0;
+        this.resetBooleans();
+
+        System.out.println("Reversing route");
+        System.out.print("New route:");
+        for (RouteOptions routeOptions : route) {
+            System.out.print("\t" + routeOptions);
+        }
+        System.out.print("\n");
+    }
+
+    private void resetBooleans() {
+        this.isOnLastAction = false;
+        this.hasPassedLastCrossover = false;
     }
 }
