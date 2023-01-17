@@ -45,6 +45,12 @@ public class MovementController {
         this.rightMotor.goToSpeed(defaultSpeedRight);
     }
 
+    public void slowForward() {
+        if (isTurning) return;
+        this.leftMotor.goToSpeed(15);
+        this.rightMotor.goToSpeed(15);
+    }
+
     public void backwards() {
         this.leftMotor.goToSpeed(-defaultSpeedRight);
         this.rightMotor.goToSpeed(-defaultSpeedLeft);
@@ -64,13 +70,13 @@ public class MovementController {
         if (isTurning) return;
 
         this.rightMotor.goToSpeed(60);
-        this.leftMotor.goToSpeed(10);
+        this.leftMotor.goToSpeed(0);
     }
 
     public void correctToTheLeft() {
         if (isTurning) return;
         this.leftMotor.goToSpeed(60);
-        this.rightMotor.goToSpeed(10);
+        this.rightMotor.goToSpeed(0);
     }
 
     public void boosy() {
@@ -79,45 +85,44 @@ public class MovementController {
     }
 
     public void turnRight() {
-
         if (!isTurning) {
             System.out.println("turning right");
-            this.leftMotor.goToSpeed(0);
-            this.rightMotor.goToSpeed(75);
+            this.leftMotor.goToSpeed(-20);
+            this.rightMotor.goToSpeed(50);
 
-            this.isTurning = true;
-            this.turningDelay = true;
-            this.addTurningDelay(400);
+            this.addTurningDelay(600);
+
         }
     }
     public void turnLeft() {
         if (!isTurning) {
             System.out.println("turning left");
-            this.leftMotor.goToSpeed(75);
-            this.rightMotor.goToSpeed(0);
+            this.leftMotor.goToSpeed(50);
+            this.rightMotor.goToSpeed(-20);
 
-            this.isTurning = true;
-            this.turningDelay = true;
-            this.addTurningDelay(400);
+
+            this.addTurningDelay(600);
         }
     }
 
-    public void turnAround() {
+    public RouteOptions turnAround() {
+        RouteOptions direction = RouteOptions.NOTHING;
         if (!isTurning) {
             System.out.println("Turning around");
 
             if (Math.random() > 0.5) {
                 this.leftMotor.goToSpeed(-30);
                 this.rightMotor.goToSpeed(30);
+                direction = RouteOptions.LEFT;
             } else {
                 this.leftMotor.goToSpeed(30);
                 this.rightMotor.goToSpeed(-30);
+                direction = RouteOptions.RIGHT;
             }
 
-            this.isTurning = true;
-            this.turningDelay = true;
-            this.addTurningDelay(1500);
+            this.addTurningDelay(2000);
         }
+        return direction;
     }
 
     public void remoteTurnLeft() {
@@ -131,6 +136,8 @@ public class MovementController {
     }
 
     private void addTurningDelay(int time) {
+        this.isTurning = true;
+        this.turningDelay = true;
         this.addDelay.addDelay("Turning delay", time, () -> {
             this.turningDelay = false;
         });

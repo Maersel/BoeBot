@@ -3,6 +3,7 @@ package controllers.pathfinding;
 import controllers.RouteOptions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Pathfinder {
@@ -156,7 +157,7 @@ public class Pathfinder {
 
 //            System.out.println("Direction:\t" + direction);
             directionCodes[i - 1] = direction;
-            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tFront:" + front + "\tTarget:\t" + target + "\tDirection:\t" + direction);
+//            System.out.println("Node:\t" + path.get(i) + "\tOrigin:\t" + origin + "\tFront:" + front + "\tTarget:\t" + target + "\tDirection:\t" + direction);
         }
 
 
@@ -205,5 +206,30 @@ public class Pathfinder {
         for (RouteOptions routeOptions : route) {
             System.out.println(routeOptions);
         }
+    }
+
+    public RouteOptions[] routePickUp(RouteOptions[] route) {
+        return this.appendRouteCommand(route, RouteOptions.PICK_UP);
+    }
+
+    public RouteOptions[] routeDrop(RouteOptions[] route) {
+        RouteOptions[] newRoute = this.prependRouteCommand(route, RouteOptions.PICK_UP);
+        return this.appendRouteCommand(newRoute, RouteOptions.DROP);
+    }
+
+    private RouteOptions[] appendRouteCommand(RouteOptions[] route, RouteOptions command) {
+        RouteOptions[] newRoute = Arrays.copyOf(route, route.length + 1);
+        newRoute[newRoute.length - 1] = command;
+        return newRoute;
+    }
+
+    private RouteOptions[] prependRouteCommand(RouteOptions[] route, RouteOptions command) {
+        RouteOptions[] newRoute = new RouteOptions[route.length + 1];
+        for (int i = 0; i < route.length; i++) {
+            newRoute[i + 1] = route[i];
+        }
+
+        newRoute[0] = command;
+        return newRoute;
     }
 }

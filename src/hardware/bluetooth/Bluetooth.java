@@ -6,6 +6,7 @@ import controllers.LineFollower;
 import controllers.MovementController;
 import controllers.StateController;
 import hardware.Updatable;
+import hardware.CheckState;
 import hardware.gripper.Gripper;
 import hardware.led.NeoPixel;
 
