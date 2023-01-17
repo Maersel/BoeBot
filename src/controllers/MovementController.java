@@ -1,6 +1,7 @@
 package controllers;
 
 import hardware.led.NeoPixel;
+import hardware.led.NeoPixelBlinking;
 import hardware.motor.GripperMotor;
 
 import hardware.motor.MovementMotor;
@@ -17,17 +18,21 @@ public class MovementController {
 
     private AddDelay addDelay;
 
+    private NeoPixelBlinking blinkingRight;
+    private NeoPixelBlinking blinkingLeft;
+
 
     private boolean isTurning;
     private boolean turningDelay;
 
 
 
-    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay) {
-        this.stateController = stateController;
+    public MovementController(MovementMotor leftMotor, MovementMotor rightMotor, AddDelay delay, NeoPixelBlinking blinkingRight, NeoPixelBlinking blinkingLeft) {
         this.leftMotor = leftMotor;
         this.rightMotor = rightMotor;
         this.addDelay = delay;
+        this.blinkingRight = blinkingRight;
+        this.blinkingLeft = blinkingLeft;
     }
 
     public boolean isTurning() {

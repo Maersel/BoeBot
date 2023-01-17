@@ -10,6 +10,7 @@ import hardware.button.Button;
 import hardware.buzzer.Buzzer;
 import hardware.gripper.Gripper;
 import hardware.led.NeoPixel;
+import hardware.led.NeoPixelBlinking;
 import hardware.linesensor.InfraRed;
 import hardware.motor.GripperMotor;
 import hardware.motor.MovementMotor;
@@ -77,11 +78,15 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
     private Buzzer buzzer;
 
+    private NeoPixelBlinking blinkingRight;
+    private NeoPixelBlinking blinkingLeft;
+
     private GoatShooing goatShooing;
 
     private UltraSonic ultraSonicFront;
     private UltraSonic ultraSonicRear;
     private RemoteController remoteController;
+    private PickUpDropController pickUpDropController;
 
     public ArrayList<Updatable> getDevices() {
         return devices;
@@ -98,15 +103,20 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
-        this.movementController = new controllers.MovementController(motorLeft, motorRight, this);
+        this.movementController = new controllers.MovementController(motorLeft, motorRight, this, blinkingRight, blinkingLeft);
 
         this.bluetooth = new Bluetooth(this.movementController, this, this.lineFollower, this.gripper, null);
+
+        this.blinkingRight = new NeoPixelBlinking(0, 5);
+        this.blinkingLeft = new NeoPixelBlinking(2, 3);
 
         this.sensorLeft = new InfraRed(SENSOR_PIN_LEFT);
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper);
+        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.pickUpDropController);
+        this.pickUpDropController = new PickUpDropController(this.movementController, this, this.gripper, this.lineFollower);
+
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
@@ -118,34 +128,6 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatShooing);
 //        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this);
 
-        /**
-         this.devices = new ArrayList<>();
-         //        this.devices.add(this.gripperMotor);
-
-         this.devices.add(this.motorLeft);
-         this.devices.add(this.motorRight);
-
-         this.devices.add(this.neoPixel);
-
-
-         // de LineFollower class MOET ALTIJD NA de sensoren in de devices lijst
-         this.devices.add(this.sensorLeft);
-         this.devices.add(this.sensorRight);
-         this.devices.add(this.sensorMiddle);
-         this.devices.add(this.lineFollower);
-
-         //        this.devices.add(this.emergencyButton);
-
-         //        this.devices.add(this.buzzer);
-
-         //        this.devices.add(this.ultraSonicRear);
-         this.devices.add(this.ultraSonicFront);
-
-         this.devices.add(this.bluetooth);
-
-         this.lineFollower.setRoute(8, 15);
-         this.lineFollower.addRouteCommand(RouteOptions.PICK_UP);
-         */
 
         //     ---------
 
@@ -183,6 +165,9 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.lineFollowingDevices.add(this.ultraSonicRear);
         this.lineFollowingDevices.add(this.buzzer);
         this.lineFollowingDevices.add(this.gripperMotor);
+        this.lineFollowingDevices.add(this.blinkingRight);
+        this.lineFollowingDevices.add(this.blinkingLeft);
+
 
         //     ---------
 
