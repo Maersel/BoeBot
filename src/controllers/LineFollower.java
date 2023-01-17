@@ -51,8 +51,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     }
 
     private void nextStep() {
-//        System.out.println("Current step:\t" + this.step + "\tmax: " + this.route.leng
-        System.out.println("Current step: \t" + this.step + "\t" + this.route[this.step]);
+//        System.out.println("Current step: \t" + this.step + "\t" + this.route[this.step]);
 
         if (this.step == this.route.length - 2) this.hasPassedLastCrossover = true;
         this.step++;
@@ -258,10 +257,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                 this.nextStep();
                 break;
             case PICK_UP:
-                System.out.println("PICK UP AAAAAAAAAAAA");
                 break;
             case DROP:
-//                this.gripper.open();
                 break;
             default:
                 System.out.println("Route error");
@@ -272,7 +269,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     @Override
     public void returnToStart() {
         if (this.isReturning) {
-            System.out.println("KLAAARRRRRRR");
+            System.out.println("Klaar met route");
             this.isFinished = true;
             return;
         }
@@ -281,7 +278,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
             this.isPremoving = false;
             return;
         }
-        System.out.println("RETURNING???");
+        System.out.println("Returning");
 
         this.isReturning = true;
         this.route = this.reverseRoute(this.route);
