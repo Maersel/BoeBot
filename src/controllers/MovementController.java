@@ -73,7 +73,6 @@ public class MovementController {
 
     public void correctToTheRight() {
         if (isTurning) return;
-
         this.rightMotor.goToSpeed(60);
         this.leftMotor.goToSpeed(0);
     }
@@ -104,7 +103,6 @@ public class MovementController {
             System.out.println("turning left");
             this.leftMotor.goToSpeed(50);
             this.rightMotor.goToSpeed(-20);
-
 
             this.addTurningDelay(600);
         }
