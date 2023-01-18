@@ -12,7 +12,8 @@ public class NeoPixelBlinking implements Updatable {
     private int neoPixel2;
 
     private final Timer timeOnOff = new Timer(500);
-    private boolean onOff;
+    private boolean onOff = true;
+    private boolean turning = false;
 
     public NeoPixelBlinking(int neoPixel1, int neoPixel2) {
         this.neoPixel1 = neoPixel1;
@@ -20,12 +21,28 @@ public class NeoPixelBlinking implements Updatable {
         timeOnOff.mark();
     }
 
+    public void setTurningOn(){
+        turning = true;
+    }
+    public void setTurningOff(){
+        turning = false;
+    }
+
     @Override
     public void update() {
-        if (timeOnOff.timeout()) {
-            BoeBot.rgbSet(neoPixel1, Color.ORANGE);
-            BoeBot.rgbSet(neoPixel2, Color.ORANGE);
-            onOff = !onOff;
+        if (turning) {
+            if (timeOnOff.timeout()) {
+                if (onOff){
+                    BoeBot.rgbSet(neoPixel1, Color.ORANGE);
+                    BoeBot.rgbSet(neoPixel2, Color.ORANGE);
+                } else {
+                    BoeBot.rgbSet(neoPixel1, Color.BLACK);
+                    BoeBot.rgbSet(neoPixel2, Color.BLACK);
+                }
+                onOff = !onOff;
+            }
+        } else {
+            BoeBot.rgbSet(neoPixel1, Color.black);
         }
         BoeBot.rgbShow();
     }

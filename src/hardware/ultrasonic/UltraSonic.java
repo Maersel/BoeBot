@@ -45,7 +45,7 @@ public class UltraSonic implements Updatable {
 
     public void turnOff() {
         this.isTurnedOn = false;
-        System.out.println("ultra on");
+        System.out.println("ultra off");
     }
 
     @Override

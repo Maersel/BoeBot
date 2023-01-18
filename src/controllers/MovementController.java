@@ -48,6 +48,8 @@ public class MovementController {
         if (isTurning) return;
         this.leftMotor.goToSpeed(defaultSpeedLeft);
         this.rightMotor.goToSpeed(defaultSpeedRight);
+        blinkingRight.setTurningOff();
+        blinkingLeft.setTurningOff();
     }
 
     public void slowForward() {
@@ -94,8 +96,8 @@ public class MovementController {
             this.leftMotor.goToSpeed(-20);
             this.rightMotor.goToSpeed(50);
 
+            blinkingRight.setTurningOn();
             this.addTurningDelay(600);
-
         }
     }
     public void turnLeft() {
@@ -104,7 +106,7 @@ public class MovementController {
             this.leftMotor.goToSpeed(50);
             this.rightMotor.goToSpeed(-20);
 
-
+            blinkingLeft.setTurningOn();
             this.addTurningDelay(600);
         }
     }

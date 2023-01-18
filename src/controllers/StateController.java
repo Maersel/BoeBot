@@ -48,6 +48,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     private ArrayList<Updatable> restDevices;
     private ArrayList<Updatable> bluetoothDevices;
     private ArrayList<Updatable> lineFollowingDevices;
+    private ArrayList<Updatable> pickUpDropDevices;
     private ArrayList<Updatable> remoteDevices;
     private ArrayList<Updatable> goatKillingDevices;
     private ArrayList<Updatable> emergencyDevices;
@@ -112,7 +113,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.goatShooing = new GoatShooing(this.movementController, this.buzzer, this);
 
         this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.goatShooing, this.pickUpDropController);
-        this.pickUpDropController = new PickUpDropController(this.movementController, this, this.gripper, this.lineFollower, this.ultraSonicRear);
+        this.pickUpDropController = new PickUpDropController(this.movementController, this, this, this.gripper, this.lineFollower, this.ultraSonicRear);
 
         this.bluetooth = new Bluetooth(this.movementController, this, this.lineFollower, this.gripper, null);
 
@@ -159,15 +160,30 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.lineFollowingDevices.add(this.sensorMiddle);
         this.lineFollowingDevices.add(this.sensorRight);
         this.lineFollowingDevices.add(this.lineFollower);
-        this.lineFollowingDevices.add(this.pickUpDropController);
         this.lineFollowingDevices.add(this.motorLeft);
         this.lineFollowingDevices.add(this.motorRight);
-//        this.lineFollowingDevices.add(this.ultraSonicFront);
-        this.lineFollowingDevices.add(this.ultraSonicRear);
+        this.lineFollowingDevices.add(this.ultraSonicFront);
         this.lineFollowingDevices.add(this.buzzer);
         this.lineFollowingDevices.add(this.gripperMotor);
         this.lineFollowingDevices.add(this.blinkingRight);
         this.lineFollowingDevices.add(this.blinkingLeft);
+
+
+        //     ---------
+
+        this.pickUpDropDevices = new ArrayList<>();
+
+        this.pickUpDropDevices.add(this.bluetooth);
+        this.pickUpDropDevices.add(this.sensorLeft);
+        this.pickUpDropDevices.add(this.sensorMiddle);
+        this.pickUpDropDevices.add(this.sensorRight);
+        this.pickUpDropDevices.add(this.lineFollower);
+        this.pickUpDropDevices.add(this.pickUpDropController);
+        this.pickUpDropDevices.add(this.motorLeft);
+        this.pickUpDropDevices.add(this.motorRight);
+        this.pickUpDropDevices.add(this.ultraSonicRear);
+        this.pickUpDropDevices.add(this.buzzer);
+        this.pickUpDropDevices.add(this.gripperMotor);
 
 
         //     ---------
@@ -221,6 +237,11 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
                 case LINE_FOLLOWING_STATE:
                     for (int i = lineFollowingDevices.size() - 1; i >= 0; i--) {
                         lineFollowingDevices.get(i).update();
+                    }
+                    break;
+                case PICK_UP_DROP_STATE:
+                    for (int i = pickUpDropDevices.size() - 1; i >= 0; i--) {
+                        pickUpDropDevices.get(i).update();
                     }
                     break;
                 case GOAT_SCARING_STATE:

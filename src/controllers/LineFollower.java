@@ -3,11 +3,11 @@ package controllers;
 
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
+import hardware.bluetooth.BluetoothCallback;
 import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private InfraRed rightSensor;
     private Gripper gripper;
     private GoatShooingCallback goatShooingCallback;
-    private hardware.bluetooth.Callback bluetoothCallback;
+    private BluetoothCallback bluetoothCallback;
     private PickUpDropController pickUpDropController;
 
     private int lineDetection;
@@ -105,7 +105,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     public void setPickUpDropController(PickUpDropController pickUpDropController) {
         this.pickUpDropController = pickUpDropController;
     }
-    public void setBluetoothCallback(hardware.bluetooth.Callback bluetoothCallback) {
+    public void setBluetoothCallback(BluetoothCallback bluetoothCallback) {
         this.bluetoothCallback = bluetoothCallback;
     }
 

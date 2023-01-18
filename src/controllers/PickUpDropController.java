@@ -7,6 +7,7 @@ import hardware.ultrasonic.UltraSonic;
 
 public class PickUpDropController implements Updatable, Callback {
     private MovementController movementController;
+    private StateController stateController;
     private AddDelay addDelay;
     private Gripper gripper;
     private LineFollowerCallback callback;
@@ -20,8 +21,9 @@ public class PickUpDropController implements Updatable, Callback {
     private boolean doingTheThing;
     private boolean hasPayload;
 
-    public PickUpDropController(MovementController movementController, AddDelay addDelay, Gripper gripper, LineFollowerCallback callback, UltraSonic ultraSonic) {
+    public PickUpDropController(MovementController movementController, StateController stateController, AddDelay addDelay, Gripper gripper, LineFollowerCallback callback, UltraSonic ultraSonic) {
         this.movementController = movementController;
+        this.stateController = stateController;
         this.addDelay = addDelay;
         this.gripper = gripper;
         this.callback = callback;
@@ -32,6 +34,8 @@ public class PickUpDropController implements Updatable, Callback {
         if (this.isTurnedOn) return;
 
         System.out.println("Turning PickUpDropController ON");
+
+        this.stateController.changeState(Configuration.PICK_UP_DROP_STATE);
         this.isTurnedOn = true;
         this.target = target;
         System.out.println("\t\t1");

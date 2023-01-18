@@ -9,7 +9,7 @@ import hardware.led.NeoPixel;
 import java.util.ArrayList;
 
 
-public class Bluetooth implements Updatable, Callback
+public class Bluetooth implements Updatable, BluetoothCallback
 //        , CheckState
 {
 
@@ -26,13 +26,12 @@ public class Bluetooth implements Updatable, Callback
     private boolean remoteMode = false;
     // ------------------
 
-    private int alpha = 0;
 
     private int neopixelId = 0;
     private boolean neopixelOn = false;
 
-//    Timer t = new Timer(230);
-
+    //    Timer t = new Timer(230);
+    private int alpha = 0;
     private int point1;
     private int point2;
     private int mode;
@@ -55,21 +54,21 @@ public class Bluetooth implements Updatable, Callback
         pointsQueue = new ArrayList<>();
     }
 
-    private void pointWrite(int data) {
-        if (alpha == 0) {
-            point1 = data;
-            System.out.println(point1);
-            alpha++;
-        } else if (alpha == 1) {
-            point2 = data;
-            System.out.println(point2);
-            alpha++;
-        } else if (alpha == 2) {
-            mode = data;
-            System.out.println(mode);
-            alpha++;
-        }
-    }
+//    private void pointWrite(int data) {
+//        if (alpha == 0) {
+//            point1 = data;
+//            System.out.println(point1);
+//            alpha++;
+//        } else if (alpha == 1) {
+//            point2 = data;
+//            System.out.println(point2);
+//            alpha++;
+//        } else if (alpha == 2) {
+//            mode = data;
+//            System.out.println(mode);
+//            alpha++;
+//        }
+//    }
 
     @Override
     public void update() {
@@ -83,33 +82,49 @@ public class Bluetooth implements Updatable, Callback
                     mapMode = false;
                     remoteMode = true;
                     System.out.println("mapMode = false\tremoteMode = true");
-                }
-                else if (data <= 45) {
-                    if (isDone) {
-                        pointWrite(data);
-                        if (alpha == 3) {
-                            if (mode == 41) {
-                                lineFollower.setRoute(point1, point2, RouteOptions.PICK_UP);
-                            } else if (mode == 42) {
-                                lineFollower.setRoute(point1, point2, RouteOptions.DROP);
-                            } else {
-                                System.out.println("compleet f*cked");
-                            }
-                            System.out.println(point1 + "\t" + point2 + "\t" + mode);
-                            stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
-                            alpha = 0;
-                            isDone = false;
-                        }
-                    } else {
-                        pointWrite(data);
-                        if (alpha == 3) {
-                            System.out.println("Que add "+point1 + " | " + point2 + " | " + mode);
-                            pointsQueue.add(point1);
-                            pointsQueue.add(point2);
-                            pointsQueue.add(mode);
-                            alpha = 0;
-                        }
+                } else if (data <= 45) {
+
+//                    pointWrite(data);
+//                    if (alpha == 3) {
+//                        if (mode == 41) {
+//                            lineFollower.setRoute(point1, point2, RouteOptions.PICK_UP);
+//                        } else if (mode == 42) {
+//                            lineFollower.setRoute(point1, point2, RouteOptions.DROP);
+//                        } else {
+//                            System.out.println("compleet f*cked");
+//                        }
+//                        System.out.println(point1 + "\t" + point2 + "\t" + mode);
+//                        stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
+//                        alpha = 0;
+//                        isDone = false;
+//                    }
+
+                    if (alpha == 0) {
+                        point1 = data;
+                        alpha++;
+                    } else if (alpha == 1) {
+                        point2 = data;
+                        alpha++;
+                    } else if (alpha == 2) {
+                        mode = data;
+                        alpha++;
                     }
+                    if (alpha == 3) {
+                        pointsQueue.add(point1);
+                        pointsQueue.add(point2);
+                        pointsQueue.add(mode);
+                        if (isDone) {
+                            checkQueue();
+                            isDone = false;
+                            stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
+                        }
+                        alpha = 0;
+
+                        System.out.println("Que add " + point1 + " | " + point2 + " | " + mode);
+                        int a = pointsQueue.size() / 3;
+                        System.out.println("queue size " + a);
+                    }
+
                 }
             }
 
@@ -219,8 +234,9 @@ public class Bluetooth implements Updatable, Callback
 
     }
 
+
     public void checkQueue() {
-        if (pointsQueue.size() > 3) {
+        if (pointsQueue.size() > 0) {
             if (pointsQueue.get(2) == 41) {
                 lineFollower.setRoute(pointsQueue.get(0), pointsQueue.get(1), RouteOptions.PICK_UP);
             } else if (pointsQueue.get(2) == 42) {
