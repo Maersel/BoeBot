@@ -2,6 +2,7 @@ package controllers;
 
 import TI.BoeBot;
 import TI.PinMode;
+import TI.Timer;
 import hardware.Updatable;
 import hardware.gripper.Gripper;
 
@@ -9,12 +10,16 @@ public class RemoteController implements Updatable {
     private MovementController movementController;
     private StateController stateController;
     private Gripper gripper;
+    private Timer timer;
+    private int pin;
 
 
-    public RemoteController(MovementController movementController, StateController stateController, Gripper gripper) {
+    public RemoteController(int pin, MovementController movementController, StateController stateController, Gripper gripper) {
+        this.pin = pin;
         this.movementController = movementController;
         this.stateController = stateController;
         this.gripper = gripper;
+        this.timer = new Timer(100);
     }
 
 //    private void update() {
@@ -36,35 +41,45 @@ public class RemoteController implements Updatable {
 
     @Override
     public void update() {
-        System.out.println("youvhi told me to");
-        BoeBot.setMode(15, PinMode.Input);
-        System.out.println("youvhi told me to 2");
+        if (!timer.timeout()) return;
+
+
+        BoeBot.setMode(this.pin, PinMode.Input);
 //        System.out.println(BoeBot.digitalRead(15));
-        int pulseLen = BoeBot.pulseIn(15, false, 6000);
-        System.out.println("youvhi told me to 3");
+
+        long startTime = System.currentTimeMillis();
+
+        int pulseLen = BoeBot.pulseIn(this.pin, false, 6000);
 //        int lengths[] = new int[7];
 //        int number = 0;
 
+//        int pulseLen = 0;
+
         if (pulseLen > 2000) {
+            this.timer = new Timer(1);
+            System.out.println("joebide"   );
+
+            this.stateController.changeState(Configuration.REMOTE_STATE);
+
             int lengths[] = new int[7];
             for (int i = 6; i >= 0; i--) {
-                lengths[i] = BoeBot.pulseIn(15, false, 20000);
+                lengths[i] = BoeBot.pulseIn(this.pin, false, 20000);
                 System.out.print(lengths[i] + " ");
             }
             int number = 0;
             int i = 7;
             for (int length : lengths) {
                 i--;
-                if (length > 300 && 800 > length) {
+                if (length < 800) {
                     length = 0;
-                } else if (length > 1100 && 1400 > length) {
+                } else if (length > 900 && 1400 > length) {
                     length = 1;
                 } else {
-                    number = 400;
+                    return;
                 }
                 number += length << i;
             }
-            System.out.println(number);
+            System.out.println("numberID "+ number);
 
 //            for (int i = 6; i >= 0; i--) {
 //                lengths[i] = BoeBot.pulseIn(15, false, 20000);
@@ -133,6 +148,10 @@ public class RemoteController implements Updatable {
             }
 
         }
+
+        long endTime = System.currentTimeMillis();
+
+//        System.out.println(endTime - startTime);
     }
 
     public boolean remotePressed() {
