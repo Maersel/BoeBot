@@ -2,14 +2,12 @@ package controllers;
 
 import TI.BoeBot;
 import TI.PinMode;
-import TI.SerialConnection;
 import controllers.pathfinding.Pathfinder;
 import hardware.Updatable;
 import hardware.bluetooth.Bluetooth;
 import hardware.button.Button;
 import hardware.buzzer.Buzzer;
 import hardware.gripper.Gripper;
-import hardware.led.NeoPixel;
 import hardware.led.NeoPixelBlinking;
 import hardware.linesensor.InfraRed;
 import hardware.motor.GripperMotor;
@@ -20,8 +18,8 @@ import hardware.whisker.Whisker;
 import java.util.ArrayList;
 
 public class StateController implements Updatable, AddDelay, hardware.button.Callback {
-    private int state = 1;
-    private int previousState;
+    private Configuration state = Configuration.REST_STATE;
+    private Configuration previousState;
 
     public final int GRIPPER_PIN = 0;
 
@@ -32,7 +30,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     public final int SENSOR_PIN_MIDDLE = 2;
     public final int SENSOR_PIN_RIGHT = 3;
 
-    public final int EMERGENCY_BUTTON_PIN = 0;
+    public final int EMERGENCY_BUTTON_PIN = 1;
 
     public final int BUZZER_PIN = 3;
 
@@ -46,7 +44,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     //     ---------
     private ArrayList<Updatable> devices;
 
-    private ArrayList<Updatable> allwaysOnDevices;
+    private ArrayList<Updatable> alwaysOnDevices;
     private ArrayList<Updatable> restDevices;
     private ArrayList<Updatable> bluetoothDevices;
     private ArrayList<Updatable> lineFollowingDevices;
@@ -88,10 +86,6 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
     private RemoteController remoteController;
     private PickUpDropController pickUpDropController;
 
-    public ArrayList<Updatable> getDevices() {
-        return devices;
-    }
-
     public void init() {
         this.pathfinder = new Pathfinder();
 
@@ -101,40 +95,45 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.gripperMotor = new GripperMotor(GRIPPER_PIN);
         this.gripper = new Gripper(gripperMotor);
 
+        this.blinkingRight = new NeoPixelBlinking(0, 5);
+        this.blinkingLeft = new NeoPixelBlinking(2, 3);
+
         this.motorLeft = new hardware.motor.MovementMotor(MOTOR_PIN_LEFT, true);
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight, this, blinkingRight, blinkingLeft);
 
-        this.bluetooth = new Bluetooth(this.movementController, this, this.lineFollower, this.gripper, null);
-
-        this.blinkingRight = new NeoPixelBlinking(0, 5);
-        this.blinkingLeft = new NeoPixelBlinking(2, 3);
 
         this.sensorLeft = new InfraRed(SENSOR_PIN_LEFT);
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.pickUpDropController);
-        this.pickUpDropController = new PickUpDropController(this.movementController, this, this.gripper, this.lineFollower);
+        this.buzzer = new Buzzer(BUZZER_PIN);
 
+        this.goatShooing = new GoatShooing(this.movementController, this.buzzer, this);
+
+        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.goatShooing, this.pickUpDropController);
+        this.pickUpDropController = new PickUpDropController(this.movementController, this, this.gripper, this.lineFollower, this.ultraSonicRear);
+
+        this.bluetooth = new Bluetooth(this.movementController, this, this.lineFollower, this.gripper, null);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
 
-//        this.buzzer = new Buzzer(BUZZER_PIN);
+        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatShooing, this);
+        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this.pickUpDropController, this);
 
-        this.goatShooing = new GoatShooing(this.movementController, this.buzzer, this);
 
-        this.ultraSonicFront = new UltraSonic(ULTRASONIC_ECHO_PIN_FRONT, ULTRASONIC_TRIGGER_PIN_FRONT, this.goatShooing);
-//        this.ultraSonicRear = new UltraSonic(ULTRASONIC_ECHO_PIN_REAR, ULTRASONIC_TRIGGER_PIN_REAR, this);
-
+        this.lineFollower.setPickUpDropController(this.pickUpDropController);
+        this.lineFollower.setBluetoothCallback(this.bluetooth);
+        this.pickUpDropController.setUltrasonic(this.ultraSonicRear);
+        this.ultraSonicRear.setCallback(this.pickUpDropController);
 
         //     ---------
 
-        this.allwaysOnDevices = new ArrayList<>();
+        this.alwaysOnDevices = new ArrayList<>();
 
-        this.allwaysOnDevices.add(this.remoteController);
-        this.allwaysOnDevices.add(this.emergencyButton);
+//        this.alwaysOnDevices.add(this.remoteController);
+        this.alwaysOnDevices.add(this.emergencyButton);
 
         //     ---------
 
@@ -155,13 +154,15 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
         this.lineFollowingDevices = new ArrayList<>();
 
+        this.lineFollowingDevices.add(this.bluetooth);
         this.lineFollowingDevices.add(this.sensorLeft);
         this.lineFollowingDevices.add(this.sensorMiddle);
         this.lineFollowingDevices.add(this.sensorRight);
         this.lineFollowingDevices.add(this.lineFollower);
+        this.lineFollowingDevices.add(this.pickUpDropController);
         this.lineFollowingDevices.add(this.motorLeft);
         this.lineFollowingDevices.add(this.motorRight);
-        this.lineFollowingDevices.add(this.ultraSonicFront);
+//        this.lineFollowingDevices.add(this.ultraSonicFront);
         this.lineFollowingDevices.add(this.ultraSonicRear);
         this.lineFollowingDevices.add(this.buzzer);
         this.lineFollowingDevices.add(this.gripperMotor);
@@ -201,38 +202,33 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
     public void run() {
         while (true) {
-
-//            for (int i = devices.size() - 1; i >= 0; i--) {
-//                devices.get(i).update();
-//            }
-
             switch (state) {
-                case Configuration.REST_STATE:
+                case REST_STATE:
                     for (int i = restDevices.size() - 1; i >= 0; i--) {
                         restDevices.get(i).update();
                     }
                     break;
-                case Configuration.REMOTE_STATE:
+                case REMOTE_STATE:
                     for (int i = remoteDevices.size() - 1; i >= 0; i--) {
                         remoteDevices.get(i).update();
                     }
                     break;
-                case Configuration.BLUETOOTH_STATE:
+                case BLUETOOTH_STATE:
                     for (int i = bluetoothDevices.size() - 1; i >= 0; i--) {
                         bluetoothDevices.get(i).update();
                     }
                     break;
-                case Configuration.LINE_FOLLOWING_STATE:
+                case LINE_FOLLOWING_STATE:
                     for (int i = lineFollowingDevices.size() - 1; i >= 0; i--) {
                         lineFollowingDevices.get(i).update();
                     }
                     break;
-                case Configuration.GOAT_SCARING_STATE:
+                case GOAT_SCARING_STATE:
                     for (int i = goatKillingDevices.size() - 1; i >= 0; i--) {
                         goatKillingDevices.get(i).update();
                     }
                     break;
-                case Configuration.EMERGENCY_STATE:
+                case EMERGENCY_STATE:
                     this.movementController.emergencyStop();
                     for (int i = emergencyDevices.size() - 1; i >= 0; i--) {
                         emergencyDevices.get(i).update();
@@ -240,20 +236,21 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
                     break;
             }
 
-            for (int i = allwaysOnDevices.size() - 1; i >= 0; i--) {
-                allwaysOnDevices.get(i).update();
+            for (int i = alwaysOnDevices.size() - 1; i >= 0; i--) {
+                alwaysOnDevices.get(i).update();
             }
 
             BoeBot.wait(1);
         }
     }
 
-    public void changeState(int state) {
+    public void changeState(Configuration state) {
         this.previousState = this.state;
         this.state = state;
+        System.out.println("state change " + state);
     }
 
-    public int getCurrentState() {
+    public Configuration getCurrentState() {
         return this.state;
     }
 
@@ -273,6 +270,6 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
     @Override
     public void addDelay(String name, int time, TimerCallback callback) {
-        this.devices.add(new Delay(name, this.devices, time, callback));
+        this.alwaysOnDevices.add(new Delay(name, this.alwaysOnDevices, time, callback));
     }
 }

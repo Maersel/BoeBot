@@ -7,23 +7,24 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Pathfinder {
-    public static void main(String[] args) {
-        Pathfinder pathfinder = new Pathfinder();
 
-        int start = 19;
-        int end = 25;
-        RouteOptions[] directions = pathfinder.findPath(start, end);
-        pathfinder.printDirections(start, end, directions);
-
-        System.out.println("\n");
-
-        pathfinder.addObstacle(12);
-        pathfinder.addObstacle(4);
-        pathfinder.addObstacle(8);
-
-        directions = pathfinder.findPath(start, end);
-        pathfinder.printDirections(start, end, directions);
-    }
+//    public static void main(String[] args) {
+//        Pathfinder pathfinder = new Pathfinder();
+//
+//        int start = 19;
+//        int end = 25;
+//        RouteOptions[] directions = pathfinder.findPath(start, end);
+//        pathfinder.printDirections(start, end, directions);
+//
+//        System.out.println("\n");
+//
+//        pathfinder.addObstacle(12);
+//        pathfinder.addObstacle(4);
+//        pathfinder.addObstacle(8);
+//
+//        directions = pathfinder.findPath(start, end);
+//        pathfinder.printDirections(start, end, directions);
+//    }
 
     private Node[] nodes;
     private ArrayList<Integer> obstacles;

@@ -16,7 +16,7 @@ public class Delay implements Updatable {
         this.timer = new Timer(time);
         this.callback = timerCallback;
 
-        System.out.println("Timer: \t" + this.name + " starting in: " + time);
+//        System.out.println("Timer: \t" + this.name + " starting in: " + time);
     }
 
     @Override

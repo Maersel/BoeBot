@@ -36,27 +36,35 @@ public class RemoteController implements Updatable {
 
     @Override
     public void update() {
+        System.out.println("youvhi told me to");
         BoeBot.setMode(15, PinMode.Input);
+        System.out.println("youvhi told me to 2");
 //        System.out.println(BoeBot.digitalRead(15));
         int pulseLen = BoeBot.pulseIn(15, false, 6000);
+        System.out.println("youvhi told me to 3");
 //        int lengths[] = new int[7];
 //        int number = 0;
-            if (pulseLen > 2000) {
-                int lengths[] = new int[7];
-                for (int i = 6; i >= 0; i--) {
-                    lengths[i] = BoeBot.pulseIn(15, false, 20000);
-                    System.out.print(lengths[i]+" ");
+
+        if (pulseLen > 2000) {
+            int lengths[] = new int[7];
+            for (int i = 6; i >= 0; i--) {
+                lengths[i] = BoeBot.pulseIn(15, false, 20000);
+                System.out.print(lengths[i] + " ");
+            }
+            int number = 0;
+            int i = 7;
+            for (int length : lengths) {
+                i--;
+                if (length > 300 && 800 > length) {
+                    length = 0;
+                } else if (length > 1100 && 1400 > length) {
+                    length = 1;
+                } else {
+                    number = 400;
                 }
-                int number = 0;
-                int i =7;
-                for (int length : lengths) {
-                    i--;
-                    if      (length>300  &&  800>length)    {length=  0;}
-                    else if (length>1100 && 1400>length)   {length = 1;}
-                    else {number=400;}
-                    number += length<<i;
-                }
-                System.out.println(number);
+                number += length << i;
+            }
+            System.out.println(number);
 
 //            for (int i = 6; i >= 0; i--) {
 //                lengths[i] = BoeBot.pulseIn(15, false, 20000);
@@ -84,7 +92,7 @@ public class RemoteController implements Updatable {
 //        if ( bits > 0) {
 //            System.out.println(Integer.toBinaryString(bits));
 //        }
-                //button overzicht
+            //button overzicht
             switch (number) {
                 case 21:
                     System.out.println("EmergencyStop");
@@ -125,13 +133,13 @@ public class RemoteController implements Updatable {
             }
 
         }
-}
+    }
 
     public boolean remotePressed() {
         return false;
     }
 
-    public int changeState() {
+    public Configuration changeState() {
         return Configuration.LINE_FOLLOWING_STATE;
     }
 }

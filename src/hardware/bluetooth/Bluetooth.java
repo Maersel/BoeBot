@@ -9,8 +9,8 @@ import hardware.led.NeoPixel;
 import java.util.ArrayList;
 
 
-public class Bluetooth implements Updatable
-//        implements CheckState
+public class Bluetooth implements Updatable, Callback
+//        , CheckState
 {
 
     private final SerialConnection serial = new SerialConnection();
@@ -39,7 +39,7 @@ public class Bluetooth implements Updatable
 
     private Boolean isDone = true;
 
-    private ArrayList<Integer> pointsQue;
+    private ArrayList<Integer> pointsQueue;
 
     public Bluetooth(MovementController movementController
             , StateController stateController
@@ -52,18 +52,21 @@ public class Bluetooth implements Updatable
         this.lineFollower = lineFollower;
         this.gripper = gripper;
         this.neoPixel = neoPixel;
-        pointsQue = new ArrayList<>();
+        pointsQueue = new ArrayList<>();
     }
 
     private void pointWrite(int data) {
         if (alpha == 0) {
             point1 = data;
+            System.out.println(point1);
             alpha++;
         } else if (alpha == 1) {
             point2 = data;
+            System.out.println(point2);
             alpha++;
         } else if (alpha == 2) {
             mode = data;
+            System.out.println(mode);
             alpha++;
         }
     }
@@ -81,7 +84,6 @@ public class Bluetooth implements Updatable
                     remoteMode = true;
                     System.out.println("mapMode = false\tremoteMode = true");
                 }
-
                 else if (data <= 45) {
                     if (isDone) {
                         pointWrite(data);
@@ -93,19 +95,19 @@ public class Bluetooth implements Updatable
                             } else {
                                 System.out.println("compleet f*cked");
                             }
+                            System.out.println(point1 + "\t" + point2 + "\t" + mode);
                             stateController.changeState(Configuration.LINE_FOLLOWING_STATE);
                             alpha = 0;
                             isDone = false;
-                            System.out.println(point1 + "\t" + point2 + "\t" + mode);
                         }
                     } else {
                         pointWrite(data);
                         if (alpha == 3) {
-                            pointsQue.add(point1);
-                            pointsQue.add(point2);
-                            pointsQue.add(mode);
+                            System.out.println("Que add "+point1 + " | " + point2 + " | " + mode);
+                            pointsQueue.add(point1);
+                            pointsQueue.add(point2);
+                            pointsQueue.add(mode);
                             alpha = 0;
-                            System.out.println(point1 + "\t" + point2 + "\t" + mode);
                         }
                     }
                 }
@@ -217,19 +219,23 @@ public class Bluetooth implements Updatable
 
     }
 
-    public void checkQue() {
-        if (pointsQue.size()>3){
-            if (pointsQue.get(2) == 41){
-                lineFollower.setRoute(pointsQue.get(0),pointsQue.get(1),RouteOptions.PICK_UP);
-            } else if (pointsQue.get(2) == 42){
-                lineFollower.setRoute(pointsQue.get(0),pointsQue.get(1),RouteOptions.DROP);
+    public void checkQueue() {
+        if (pointsQueue.size() > 3) {
+            if (pointsQueue.get(2) == 41) {
+                lineFollower.setRoute(pointsQueue.get(0), pointsQueue.get(1), RouteOptions.PICK_UP);
+            } else if (pointsQueue.get(2) == 42) {
+                lineFollower.setRoute(pointsQueue.get(0), pointsQueue.get(1), RouteOptions.DROP);
             }
-            pointsQue.subList(0, 3).clear();
+            pointsQueue.subList(0, 3).clear();
         } else {
             isDone = true;
         }
     }
 
+    @Override
+    public void lineFollowerQueue() {
+        checkQueue();
+    }
 }
 
 

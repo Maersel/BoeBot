@@ -7,6 +7,7 @@ import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +20,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private InfraRed middleSensor;
     private InfraRed rightSensor;
     private Gripper gripper;
+    private GoatShooingCallback goatShooingCallback;
+    private hardware.bluetooth.Callback bluetoothCallback;
     private PickUpDropController pickUpDropController;
 
     private int lineDetection;
@@ -40,9 +43,12 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     private int noLines;
 
+    private int instant;
+
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
-                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper, PickUpDropController pickUpDropController) {
+                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper,
+                        GoatShooingCallback goatShooingCallback, PickUpDropController pickUpDropController) {
         this.movementController = movementController;
         this.addDelay = addDelay;
         this.pathfinder = pathfinder;
@@ -51,6 +57,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
         this.gripper = gripper;
+        this.goatShooingCallback = goatShooingCallback;
+        this.pickUpDropController = pickUpDropController;
         this.hasEndGoal = false;
 
         this.setCallbacks();
@@ -75,6 +83,11 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         }
 
         this.step = 0;
+        this.isFinished = false;
+        this.isReturning = false;
+        this.isPremoving = false;
+        this.premove = false;
+        this.resetBooleans();
     }
 
     public void printRoute() {
@@ -91,6 +104,9 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     public void setPickUpDropController(PickUpDropController pickUpDropController) {
         this.pickUpDropController = pickUpDropController;
+    }
+    public void setBluetoothCallback(hardware.bluetooth.Callback bluetoothCallback) {
+        this.bluetoothCallback = bluetoothCallback;
     }
 
     private void setCallbacks() {
@@ -114,7 +130,9 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     @Override
     public void update() {
-
+//        System.out.println(Instant.now().getNano() - this.instant);
+//        this.instant = Instant.now().getNano();
+//        System.out.println(this.route[this.step]);
 //        System.out.println(Integer.toBinaryString(this.lineDetection));
         if (isFinished) return;
 
@@ -136,6 +154,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         if (this.isOnLastAction) {
             this.pickUpDropController.turnOn((this.route[this.route.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
 
+            goatShooingCallback.turnOff();
+
             // mogelijk een probleem later
             if (this.lineDetection == 0b010 || this.lineDetection == 0b111) this.movementController.turnOffTurning();
 
@@ -150,8 +170,10 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                 if (hasPassedLastCrossover && !this.movementController.isTurning()) {
                     this.noLines++;
 
-                    if (this.noLines > 30)
+                    if (this.noLines > 30) {
+                        System.out.println("eens");
                         this.isOnLastAction = true;
+                    }
                 }
                 break;
             case 0b001:
@@ -244,6 +266,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
             case NOTHING:
                 break;
             case STRAIGHT:
+                System.out.println("hallo anas");
                 this.nextStep();
                 break;
             case LEFT:
@@ -282,6 +305,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         if (this.isReturning) {
             System.out.println("KLAAARRRRRRR");
             this.isFinished = true;
+            this.bluetoothCallback.lineFollowerQueue();
             return;
         }
 
@@ -290,6 +314,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
             return;
         }
         System.out.println("RETURNING???");
+        goatShooingCallback.turnOn();
 
         this.isReturning = true;
         this.route = this.reverseRoute(this.route);

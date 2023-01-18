@@ -3,12 +3,14 @@ package controllers;
 import hardware.Updatable;
 import hardware.gripper.Gripper;
 import hardware.ultrasonic.Callback;
+import hardware.ultrasonic.UltraSonic;
 
 public class PickUpDropController implements Updatable, Callback {
     private MovementController movementController;
     private AddDelay addDelay;
     private Gripper gripper;
     private LineFollowerCallback callback;
+    private UltraSonic ultraSonic;
 
     private RouteOptions target;
     private RouteOptions turningDirection;
@@ -18,11 +20,12 @@ public class PickUpDropController implements Updatable, Callback {
     private boolean doingTheThing;
     private boolean hasPayload;
 
-    public PickUpDropController(MovementController movementController, AddDelay addDelay, Gripper gripper, LineFollowerCallback callback) {
+    public PickUpDropController(MovementController movementController, AddDelay addDelay, Gripper gripper, LineFollowerCallback callback, UltraSonic ultraSonic) {
         this.movementController = movementController;
         this.addDelay = addDelay;
         this.gripper = gripper;
         this.callback = callback;
+        this.ultraSonic = ultraSonic;
     }
 
     public void turnOn(RouteOptions target) {
@@ -31,7 +34,9 @@ public class PickUpDropController implements Updatable, Callback {
         System.out.println("Turning PickUpDropController ON");
         this.isTurnedOn = true;
         this.target = target;
-
+        System.out.println("\t\t1");
+        this.ultraSonic.turnOn();
+        System.out.println("\t\t2");
         if (this.target == RouteOptions.PICK_UP) this.hasPayload = false;
         if (this.target == RouteOptions.DROP) this.hasPayload = true;
     }
@@ -44,6 +49,8 @@ public class PickUpDropController implements Updatable, Callback {
         this.doingTheThing = false;
         this.hasPayload = false;
         this.target = null;
+
+        this.ultraSonic.turnOff();
     }
 
     public void forcehasTurnedAround() {
@@ -56,7 +63,7 @@ public class PickUpDropController implements Updatable, Callback {
         if (this.isTurnedOn) {
             if (this.target == RouteOptions.PICK_UP) {
                 if (!this.gripper.isOpen() && !doingTheThing) this.gripper.open();
-
+//                System.out.println("before turn");
                 this.turnAround();
                 this.lineCorrection();
 
@@ -73,6 +80,7 @@ public class PickUpDropController implements Updatable, Callback {
                 if (this.hasPayload && gripper.isClosed()) {
                     System.out.println("BEGIN OPNIEUW");
                     this.callback.returnToStart();
+                    this.ultraSonic.turnOff();
                     this.turnOff();
                     return;
                 }
@@ -96,6 +104,7 @@ public class PickUpDropController implements Updatable, Callback {
                 if (!this.hasPayload && gripper.isOpen()) {
                     System.out.println("TURN OFF");
                     this.callback.returnToStart();
+                    this.ultraSonic.turnOff();
                     this.turnOff();
                 }
             }
@@ -105,6 +114,7 @@ public class PickUpDropController implements Updatable, Callback {
 
     private void turnAround() {
         if (!hasTurnedAround) {
+            System.out.println("turnaround()");
             this.turningDirection = this.movementController.turnAround();
             this.hasTurnedAround = true;
         }
@@ -136,5 +146,10 @@ public class PickUpDropController implements Updatable, Callback {
             return;
         }
         this.isCloseEnough = true;
+    }
+
+    public void setUltrasonic(UltraSonic ultraSonicRear) {
+        this.ultraSonic = ultraSonicRear;
+        this.ultraSonic.turnOff();
     }
 }

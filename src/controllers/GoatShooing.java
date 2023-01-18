@@ -6,7 +6,7 @@ import hardware.Updatable;
 import hardware.buzzer.Buzzer;
 import hardware.ultrasonic.Callback;
 
-public class GoatShooing implements Updatable, Callback {
+public class GoatShooing implements Updatable, Callback, GoatShooingCallback {
     private MovementController movementController;
     private Timer timer;
     private Timer timer1;
@@ -31,10 +31,11 @@ public class GoatShooing implements Updatable, Callback {
         return this.isTurnedOn;
     }
 
+    @Override
     public void turnOn() {
         this.isTurnedOn = true;
     }
-
+    @Override
     public void turnOff() {
         this.isTurnedOn = false;
     }
@@ -97,6 +98,7 @@ public class GoatShooing implements Updatable, Callback {
 
     @Override
     public void onUltraSonic(int distance) {
+        if (!this.isTurnedOn) { return; }
         if (!isShooingGoats && distance < 15 && distance > 3) {
             System.out.println(distance);
             isShooingGoats = true;

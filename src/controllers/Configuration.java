@@ -1,10 +1,10 @@
 package controllers;
 
-public class Configuration {
-    public static final int REST_STATE = 0;
-    public static final int REMOTE_STATE = 1;
-    public static final int BLUETOOTH_STATE = 2;
-    public static final int LINE_FOLLOWING_STATE = 3;
-    public static final int GOAT_SCARING_STATE = 4;
-    public static final int EMERGENCY_STATE = 5;
+public enum Configuration {
+    REST_STATE,
+    REMOTE_STATE,
+    BLUETOOTH_STATE,
+    LINE_FOLLOWING_STATE,
+    GOAT_SCARING_STATE,
+    EMERGENCY_STATE,
 }
