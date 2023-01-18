@@ -54,7 +54,7 @@ public class RemoteController implements Updatable {
 //        int number = 0;
 
 //        int pulseLen = 0;
-
+//        System.out.println("naaaaaaaaaaaaaaaa");
         if (pulseLen > 2000) {
             this.timer = new Timer(1);
             System.out.println("joebide"   );
@@ -134,13 +134,15 @@ public class RemoteController implements Updatable {
                     this.movementController.stop();
                     break;
                 case 3:
-                    System.out.println("Grijpen");
+                    System.out.println(" Grijpen");
                     this.gripper.close();
                     break;
                 case 5:
-                    System.out.println("Loslaten");
+                    System.out.println(" Loslaten");
                     this.gripper.open();
-
+                case 6:
+                    System.out.println("Bluetooth");
+                    this.stateController.changeState(Configuration.BLUETOOTH_STATE);
 //        else {
 //            System.out.println("ELSE");
 //        this.movementController.stop();
