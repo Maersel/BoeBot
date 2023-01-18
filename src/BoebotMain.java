@@ -108,7 +108,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
         this.sensorMiddle = new InfraRed(SENSOR_PIN_MIDDLE);
 
-        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle, this.gripper, this.pickUpDropController);
+        this.lineFollower = new LineFollower(this.movementController, this, this.pathfinder, this.sensorLeft, this.sensorRight, this.sensorMiddle);
 
         this.emergencyButton = new Button(EMERGENCY_BUTTON_PIN, this);
 
@@ -149,8 +149,10 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
         this.devices.add(this.ultraSonicRear);
 //        this.devices.add(this.ultraSonicFront);
 
-        this.lineFollower.setRoute(15, 13, RouteOptions.PICK_UP);
+//        this.lineFollower.addRoute(15, 13, RouteOptions.DROP);
+        this.lineFollower.addRoute(14, 15, RouteOptions.PICK_UP);
         this.lineFollower.printRoute();
+        System.out.println("test");
 
         this.lineFollower.setPickUpDropController(this.pickUpDropController);
         this.ultraSonicRear.setCallback(this.pickUpDropController);
@@ -159,8 +161,7 @@ public class BoebotMain implements hardware.whisker.Callback, hardware.button.Ca
     }
 
     private void run() {
-        Timer t = new Timer(7500);
-
+//        Timer t = new Timer(7500);
         while (true) {
 //            if (t.timeout()) {
 //                System.out.println("Doe iets");

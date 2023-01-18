@@ -7,6 +7,7 @@ import hardware.gripper.Gripper;
 import hardware.linesensor.Callback;
 import hardware.linesensor.InfraRed;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,8 +23,10 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     private int lineDetection;
     private boolean isOnCrossover;
-    private RouteOptions[] route;
-    private int step;
+    private ArrayList<RouteOptions[]> queue;
+    private RouteOptions[] activeRoute;
+    private int queueStep;
+    private int routeStep;
 
     private boolean isFinished;
     private boolean isOnLastAction;
@@ -35,10 +38,11 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     private boolean isReturning;
 
     private int noLines;
+    private int instant;
 
 
     public LineFollower(MovementController movementController, AddDelay addDelay, Pathfinder pathfinder,
-                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor, Gripper gripper, PickUpDropController pickUpDropController) {
+                        InfraRed leftSensor, InfraRed rightSensor, InfraRed middleSensor) {
         this.movementController = movementController;
         this.addDelay = addDelay;
         this.pathfinder = pathfinder;
@@ -47,37 +51,44 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         this.rightSensor = rightSensor;
         this.lineDetection = 0;
 
+        this.queue = new ArrayList<>();
+
+        this.queueStep = 0;
+        this.routeStep = 0;
+
         this.setCallbacks();
     }
 
     private void nextStep() {
-//        System.out.println("Current step: \t" + this.step + "\t" + this.route[this.step]);
+//        System.out.println("Current step: \t" + this.step + "\t" + this.activeRoute[this.step]);
+        this.activeRoute = this.queue.get(this.queueStep);
 
-        if (this.step == this.route.length - 2) this.hasPassedLastCrossover = true;
-        this.step++;
+        if (this.routeStep == this.activeRoute.length - 2) this.hasPassedLastCrossover = true;
+        this.routeStep++;
     }
 
-    public void setRoute(int startingPoint, int endPoint, RouteOptions pickUpOrDrop) {
+    public void addRoute(int startingPoint, int endPoint, RouteOptions pickUpOrDrop) {
         ArrayList<Integer> path = pathfinder.nodePath(startingPoint, endPoint);
-        this.route = pathfinder.pathDirections(path);
+        RouteOptions[] newRoute = pathfinder.pathDirections(path);
 
         if (pickUpOrDrop == RouteOptions.PICK_UP) {
-            this.route = pathfinder.routePickUp(this.route);
+            newRoute = pathfinder.routePickUp(newRoute);
         } else if (pickUpOrDrop == RouteOptions.DROP) {
-            this.route = pathfinder.routeDrop(this.route);
+            newRoute = pathfinder.routeDrop(newRoute);
         }
 
-        this.step = 0;
-    }
+        this.queue.add(newRoute);
 
+        this.activeRoute = this.queue.get(this.queueStep);
+    }
     public void printRoute() {
-        for (RouteOptions routeOptions : this.route) {
+        for (RouteOptions routeOptions : this.activeRoute) {
             System.out.println(routeOptions);
         }
 
 //        System.out.println("\nNieuw\n");
 //
-//        for (RouteOptions routeOptions : this.reverseRoute(this.route)) {
+//        for (RouteOptions routeOptions : this.reverseRoute(this.activeRoute)) {
 //            System.out.println(routeOptions);
 //        }
     }
@@ -107,14 +118,16 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
 
     @Override
     public void update() {
+//        System.out.println(Instant.now().getNano() - this.instant);
+//        this.instant = Instant.now().getNano();
 //        System.out.println(Integer.toBinaryString(this.lineDetection));
         if (isFinished) return;
 
-        if (this.route[0] == RouteOptions.PICK_UP && !this.premove) {
+        if (this.activeRoute[0] == RouteOptions.PICK_UP && !this.premove) {
             this.premove = true;
             this.isPremoving = true;
 
-            this.pickUpDropController.turnOn(this.route[0]);
+            this.pickUpDropController.turnOn(this.activeRoute[0]);
             this.pickUpDropController.forcehasTurnedAround();
 
             this.nextStep();
@@ -126,7 +139,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         }
 
         if (this.isOnLastAction) {
-            this.pickUpDropController.turnOn((this.route[this.route.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
+            this.pickUpDropController.turnOn((this.activeRoute[this.activeRoute.length - 1] == RouteOptions.PICK_UP) ? RouteOptions.PICK_UP : RouteOptions.DROP);
 
             // mogelijk een probleem later
             if (this.lineDetection == 0b010 || this.lineDetection == 0b111) this.movementController.turnOffTurning();
@@ -171,7 +184,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                     this.isOnCrossover = false;
                 });
 
-                this.executeRouteCommand(this.route[this.step]);
+                this.executeRouteCommand(this.activeRoute[this.routeStep]);
                 break;
             default:
                 System.out.println("ERROR: \t" + Integer.toBinaryString(this.lineDetection));
@@ -269,8 +282,16 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
     @Override
     public void returnToStart() {
         if (this.isReturning) {
-            System.out.println("Klaar met route");
+            System.out.println("Klaar met activeRoute\t" + this.queueStep);
             this.isFinished = true;
+            this.addDelay.addDelay("Finished route cooldown", 3000, () -> {
+                this.isFinished = false;
+            });
+            this.queueStep++;
+            this.routeStep = 0;
+            System.out.println("Start nieuwe route\t" + this.queueStep);
+
+            this.printRoute();
             return;
         }
 
@@ -281,13 +302,13 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         System.out.println("Returning");
 
         this.isReturning = true;
-        this.route = this.reverseRoute(this.route);
-        this.step = 0;
+        this.activeRoute = this.reverseRoute(this.activeRoute);
+        this.routeStep = 0;
         this.resetBooleans();
 
-        System.out.println("Reversing route");
-        System.out.print("New route:");
-        for (RouteOptions routeOptions : route) {
+        System.out.println("Reversing activeRoute");
+        System.out.print("New activeRoute:");
+        for (RouteOptions routeOptions : activeRoute) {
             System.out.print("\t" + routeOptions);
         }
         System.out.print("\n");
