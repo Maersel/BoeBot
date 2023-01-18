@@ -2,11 +2,11 @@ package controllers.pathfinding;
 
 public class Node {
     private int id;
-    private int[] neigbours;
+    private int[] neighbours;
 
-    public Node(int id, int[] neigbours) {
+    public Node(int id, int[] neighbours) {
         this.id = id;
-        this.neigbours = neigbours;
+        this.neighbours = neighbours;
     }
 
     public int getId() {
@@ -14,13 +14,13 @@ public class Node {
     }
 
     public int[] getNeigbours() {
-        return neigbours;
+        return neighbours;
     }
 
     public void removeNodeFromNeigbour(int node) {
         for (int i = 0; i < 4; i++) {
-            if (this.neigbours[i] == node) {
-                this.neigbours[i] = 0;
+            if (this.neighbours[i] == node) {
+                this.neighbours[i] = 0;
             }
         }
     }

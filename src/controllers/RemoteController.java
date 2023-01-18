@@ -42,7 +42,7 @@ public class RemoteController implements Updatable {
 //        int lengths[] = new int[7];
 //        int number = 0;
             if (pulseLen > 2000) {
-                int lengths[] = new int[7];
+                int[] lengths = new int[7];
                 for (int i = 6; i >= 0; i--) {
                     lengths[i] = BoeBot.pulseIn(15, false, 20000);
                     System.out.print(lengths[i]+" ");
