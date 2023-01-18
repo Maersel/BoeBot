@@ -32,6 +32,8 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
     public final int EMERGENCY_BUTTON_PIN = 1;
 
+    public final int REMOTE_CONTROLLER_PIN = 15;
+
     public final int BUZZER_PIN = 3;
 
     public final int ULTRASONIC_ECHO_PIN_FRONT = 8;
@@ -103,6 +105,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
         this.motorRight = new hardware.motor.MovementMotor(MOTOR_PIN_RIGHT, false);
         this.movementController = new controllers.MovementController(motorLeft, motorRight, this, blinkingRight, blinkingLeft);
 
+        this.remoteController = new RemoteController(REMOTE_CONTROLLER_PIN, this.movementController, this, this.gripper);
 
         this.sensorLeft = new InfraRed(SENSOR_PIN_LEFT);
         this.sensorRight = new InfraRed(SENSOR_PIN_RIGHT);
@@ -133,7 +136,7 @@ public class StateController implements Updatable, AddDelay, hardware.button.Cal
 
         this.alwaysOnDevices = new ArrayList<>();
 
-//        this.alwaysOnDevices.add(this.remoteController);
+        this.alwaysOnDevices.add(this.remoteController);
         this.alwaysOnDevices.add(this.emergencyButton);
 
         //     ---------
