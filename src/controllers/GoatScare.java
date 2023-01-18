@@ -34,7 +34,6 @@ public class GoatScare implements Updatable {
         if (this.ultraSonic.closeObject()){
             this.turnOn();
         }
-
     }
 
     @Override

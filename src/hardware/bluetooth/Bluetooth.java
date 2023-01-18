@@ -14,13 +14,13 @@ public class Bluetooth implements CheckState {
     private final MovementController movementController;
 
 
-    private final int forwardKey = 'e';
-    private final int backwardKey = 'd';
-    private final int turnLeftKey = 's';
-    private final int rightTurnKey = 'f';
-    private final int correctRightKey = 'g';
-    private final int correctLeftKey = 'a';
-    private final int boosyKey = 'r';
+    private final char FORWARD_KEY = 'e';
+    private final char BACKWARDS_KEY = 'd';
+    private final char TURN_LEFT_KEY = 's';
+    private final char TURN_RIGHT_KEY = 'f';
+    private final char CORRECT_RIGHT_KEY = 'g';
+    private final char CORRECT_LEFT_KEY = 'a';
+    private final char BOOST_KEY = 'r';
     private final StateController stateController;
     private final Callback callback;
 
@@ -46,36 +46,36 @@ public class Bluetooth implements CheckState {
         if (serial.available() > 0) {
             int data = serial.readByte();
 
-            if (data == forwardKey)
+            if (data == FORWARD_KEY)
             {
                 movementController.forward();
                 System.out.println("forward");
             }
-            else if (data == backwardKey)
+            else if (data == BACKWARDS_KEY)
             {
                 movementController.backwards();
                 System.out.println("backwards");
             }
-            else if (data == correctLeftKey)
+            else if (data == CORRECT_LEFT_KEY)
             {
                 movementController.correctLeft();
                 System.out.println("correctLeft");
             }
-            else if (data == correctRightKey)
+            else if (data == CORRECT_RIGHT_KEY)
             {
                 movementController.correctRight();
                 System.out.println("correctRight");
             }
-            else if (data == boosyKey)
+            else if (data == BOOST_KEY)
             {
                 movementController.boosy();
                 System.out.println("boosy");
             }
-            else if (data == turnLeftKey) {
+            else if (data == TURN_LEFT_KEY) {
                 movementController.turnLeft();
                 System.out.println("turnLeft");
             }
-            else if (data == rightTurnKey) {
+            else if (data == TURN_RIGHT_KEY) {
                 movementController.turnRight();
                 System.out.println("turnRight");
             }

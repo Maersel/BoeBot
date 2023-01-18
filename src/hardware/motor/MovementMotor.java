@@ -41,7 +41,7 @@ public class MovementMotor extends Motor {
             super.goalSpeed += amount;
     }
 
-    public void MMupdate() {
+    public void movementMotorUpdate() {
         update();
     }
 }

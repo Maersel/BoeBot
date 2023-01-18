@@ -64,7 +64,7 @@ public class MovementController {
     }
 
     public void update() {
-        rightMotor.MMupdate();
-        leftMotor.MMupdate();
+        rightMotor.movementMotorUpdate();
+        leftMotor.movementMotorUpdate();
     }
 }

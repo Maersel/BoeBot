@@ -34,9 +34,11 @@ public class StateController implements Updatable, Callback {
     @Override
     public void update() {
         if (emergencyButton.buttonPressed()) {
+            this.previousState = this.state;
             this.state = Configuration.EMERGENCY_STATE;
             this.movementController.emergencyStop();
         } else if (ultraSonic.closeObject()) {
+            this.previousState = this.state;
             this.state = Configuration.GOAT_SCARING_STATE;
             this.goatScare.turnOn();
         }
