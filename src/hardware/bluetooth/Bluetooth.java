@@ -72,7 +72,9 @@ public class Bluetooth implements Updatable, BluetoothCallback
 
     @Override
     public void update() {
-
+        if (stateController.getCurrentState() == Configuration.REST_STATE){
+            pointsQueue.clear();
+        }
         if (serial.available() > 0) {
             int data = serial.readByte();
 
@@ -128,101 +130,101 @@ public class Bluetooth implements Updatable, BluetoothCallback
                 }
             }
 
-            if (remoteMode) {
-
-                switch (data) {
-
-                    // ----- State changes -----
-                    // lineFollowModeChange doet op het moment nog niks
-                    case 50:
-                        mapMode = true;
-                        remoteMode = false;
-                        System.out.println("remoteMode = false\tmapMode = true");
-                        break;
-                    // -------------------------
-
-//                    t.mark();
-
-                    // ----- movementcontrols -----
-                    case 101:
-                        movementController.forward();
-                        System.out.println("forward");
-                        break;
-                    case 102:
-                        movementController.backwards();
-                        System.out.println("backwards");
-                        break;
-                    case 103:
-                        movementController.correctToTheLeft();
-                        System.out.println("correctLeft");
-                        break;
-                    case 104:
-                        movementController.correctToTheRight();
-                        System.out.println("correctRight");
-                        break;
-                    case 105:
-                        movementController.boosy();
-                        System.out.println("boosy");
-                        break;
-                    case 106:
-                        movementController.turnLeft();
-                        System.out.println("turnLeft");
-                        break;
-                    case 107:
-                        movementController.turnRight();
-                        System.out.println("turnRight");
-                        break;
-                    // ------------------------------
-
-
-                    // ----- neopixels -----
-//                    case 111:
-//                        if (neopixelId != 1) {
-//                            neoPixel.setColour(1f, true);
-//                            neopixelId = 1;
-//                            neopixelOn = true;
-//                        } else {
-//                            neopixelOn = !neopixelOn;
-//                            neoPixel.setColour(1f, neopixelOn);
-//                        }
-//                        System.out.println("neoPixeleKey1");
+//            if (remoteMode) {
+//
+//                switch (data) {
+//
+//                    // ----- State changes -----
+//                    // lineFollowModeChange doet op het moment nog niks
+//                    case 50:
+//                        mapMode = true;
+//                        remoteMode = false;
+//                        System.out.println("remoteMode = false\tmapMode = true");
 //                        break;
-//                    case 112:
-//                        if (neopixelId != 2) {
-//                            neoPixel.setColour(0.5f, true);
-//                            neopixelId = 2;
-//                            neopixelOn = true;
-//                        } else {
-//                            neopixelOn = !neopixelOn;
-//                            neoPixel.setColour(0.2f, neopixelOn);
-//                        }
-//                        System.out.println("neoPixeleKey2");
+//                    // -------------------------
+//
+////                    t.mark();
+//
+//                    // ----- movementcontrols -----
+//                    case 101:
+//                        movementController.forward();
+//                        System.out.println("forward");
 //                        break;
-                    // --------------------
-
-
-                    // ----- gripper -----
-                    case 121:
-                        gripper.open();
-                        System.out.println("open");
-                        break;
-                    case 122:
-                        gripper.close();
-                        System.out.println("close");
-                        break;
-                    // --------------------
-
-
-                    // dit zorgt er voor dat je de besturings knoppen ingedrukt moet houden om de boebot te laten rijden
-//                    default:
-//                        if (t.timeout()) {
-//                            movementController.stop();
-//                            System.out.println("stop");
-//                        }
+//                    case 102:
+//                        movementController.backwards();
+//                        System.out.println("backwards");
 //                        break;
-                }
-
-            }
+//                    case 103:
+//                        movementController.correctToTheLeft();
+//                        System.out.println("correctLeft");
+//                        break;
+//                    case 104:
+//                        movementController.correctToTheRight();
+//                        System.out.println("correctRight");
+//                        break;
+//                    case 105:
+//                        movementController.boosy();
+//                        System.out.println("boosy");
+//                        break;
+//                    case 106:
+//                        movementController.turnLeft();
+//                        System.out.println("turnLeft");
+//                        break;
+//                    case 107:
+//                        movementController.turnRight();
+//                        System.out.println("turnRight");
+//                        break;
+//                    // ------------------------------
+//
+//
+//                    // ----- neopixels -----
+////                    case 111:
+////                        if (neopixelId != 1) {
+////                            neoPixel.setColour(1f, true);
+////                            neopixelId = 1;
+////                            neopixelOn = true;
+////                        } else {
+////                            neopixelOn = !neopixelOn;
+////                            neoPixel.setColour(1f, neopixelOn);
+////                        }
+////                        System.out.println("neoPixeleKey1");
+////                        break;
+////                    case 112:
+////                        if (neopixelId != 2) {
+////                            neoPixel.setColour(0.5f, true);
+////                            neopixelId = 2;
+////                            neopixelOn = true;
+////                        } else {
+////                            neopixelOn = !neopixelOn;
+////                            neoPixel.setColour(0.2f, neopixelOn);
+////                        }
+////                        System.out.println("neoPixeleKey2");
+////                        break;
+//                    // --------------------
+//
+//
+//                    // ----- gripper -----
+//                    case 121:
+//                        gripper.open();
+//                        System.out.println("open");
+//                        break;
+//                    case 122:
+//                        gripper.close();
+//                        System.out.println("close");
+//                        break;
+//                    // --------------------
+//
+//
+//                    // dit zorgt er voor dat je de besturings knoppen ingedrukt moet houden om de boebot te laten rijden
+////                    default:
+////                        if (t.timeout()) {
+////                            movementController.stop();
+////                            System.out.println("stop");
+////                        }
+////                        break;
+//                }
+//
+//            }
 
         }
 
@@ -230,7 +232,6 @@ public class Bluetooth implements Updatable, BluetoothCallback
 //    public boolean isInValidState() {
 //        return (this.stateController.currentState() == Configuration.REMOTE_STATE);
 //    }
-
 
     }
 

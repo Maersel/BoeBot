@@ -88,6 +88,8 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
         this.isPremoving = false;
         this.premove = false;
         this.resetBooleans();
+
+        this.printRoute();
     }
 
     public void printRoute() {
@@ -198,7 +200,7 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
                 System.out.println("Kruispunt");
 
                 this.isOnCrossover = true;
-                this.addDelay.addDelay("Crossover delay", 400, () -> {
+                this.addDelay.addDelay("Crossover delay", 500, () -> {
                     this.isOnCrossover = false;
                 });
 
@@ -266,7 +268,6 @@ public class LineFollower implements Callback, Updatable, LineFollowerCallback {
             case NOTHING:
                 break;
             case STRAIGHT:
-                System.out.println("hallo anas");
                 this.nextStep();
                 break;
             case LEFT:

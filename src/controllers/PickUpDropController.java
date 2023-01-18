@@ -38,9 +38,7 @@ public class PickUpDropController implements Updatable, Callback {
         this.stateController.changeState(Configuration.PICK_UP_DROP_STATE);
         this.isTurnedOn = true;
         this.target = target;
-        System.out.println("\t\t1");
         this.ultraSonic.turnOn();
-        System.out.println("\t\t2");
         if (this.target == RouteOptions.PICK_UP) this.hasPayload = false;
         if (this.target == RouteOptions.DROP) this.hasPayload = true;
     }

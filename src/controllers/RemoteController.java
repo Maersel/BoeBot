@@ -141,8 +141,8 @@ public class RemoteController implements Updatable {
                     System.out.println(" Loslaten");
                     this.gripper.open();
                 case 6:
-                    System.out.println("Bluetooth");
-                    this.stateController.changeState(Configuration.BLUETOOTH_STATE);
+                    System.out.println("rust");
+                    this.stateController.changeState(Configuration.REST_STATE);
 //        else {
 //            System.out.println("ELSE");
 //        this.movementController.stop();

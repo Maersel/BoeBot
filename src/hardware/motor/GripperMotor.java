@@ -9,6 +9,9 @@ public class GripperMotor extends Motor {
     public int getCurrentSpeed() {
         return super.maxSpeed - super.currentSpeed;
     }
+    public int setCurrentSpeed(int speed) {
+        return super.currentSpeed = speed;
+    }
 
     @Override
     public void emergencyStop() {

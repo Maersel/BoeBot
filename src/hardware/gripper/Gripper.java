@@ -10,6 +10,7 @@ public class Gripper {
         this.motor = motor;
 
         // default
+        this.motor.setCurrentSpeed(1800);
         this.open();
     }
 
