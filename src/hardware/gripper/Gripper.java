@@ -13,6 +13,18 @@ public class Gripper {
         this.open();
     }
 
+    public boolean isOpen() {
+        return motor.getCurrentSpeed() == 0;
+    }
+
+    public boolean isClosed() {
+        return motor.getCurrentSpeed() == 525;
+    }
+
+    public void printCurrentSpeed() {
+        System.out.println(motor.getCurrentSpeed());
+    }
+
     public void open() {
         this.motor.goToSpeed(350);
     }

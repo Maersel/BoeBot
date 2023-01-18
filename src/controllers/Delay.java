@@ -22,7 +22,7 @@ public class Delay implements Updatable {
     @Override
     public void update() {
         if (timer.timeout()) {
-            System.out.println("Timer: \t" + this.name + " firing now");
+//            System.out.println("Timer: \t" + this.name + " firing now");
             devices.remove(this);
             callback.fire();
         }

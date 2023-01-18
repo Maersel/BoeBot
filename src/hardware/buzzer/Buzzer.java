@@ -14,7 +14,7 @@ public class Buzzer implements Updatable {
     private boolean isTurnedOn;
 
     public Buzzer(int pin) {
-        System.out.println("Buzzer constr");
+//        System.out.println("Buzzer constr");
         this.pin = pin;
         this.firstPing = true;
         this.isTurnedOn = false;
@@ -22,6 +22,7 @@ public class Buzzer implements Updatable {
         BoeBot.setMode(this.pin, PinMode.Output);
         this.timer = new Timer(3000);
         this.timer2 = new Timer(200);
+        this.timer.mark();
     }
 
     public void turnOn() {
